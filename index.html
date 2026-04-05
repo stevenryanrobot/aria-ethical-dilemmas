@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARIA — Ethical Dilemmas of a Home Robot</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- LANDING SCREEN -->
+    <div id="landing-screen" class="screen active">
+        <div class="landing-bg">
+            <div class="floating-particles">
+                <div class="particle p1"></div>
+                <div class="particle p2"></div>
+                <div class="particle p3"></div>
+                <div class="particle p4"></div>
+                <div class="particle p5"></div>
+            </div>
+            <div class="landing-content">
+                <div class="landing-robot-container">
+                    <svg class="landing-robot" viewBox="0 0 200 300" width="200" height="300">
+                        <!-- Robot Head -->
+                        <rect x="55" y="20" width="90" height="70" rx="20" fill="#4A90D9" stroke="#2C5F8A" stroke-width="2"/>
+                        <rect x="70" y="45" width="22" height="12" rx="6" fill="#A8E6CF" class="robot-eye left-eye"/>
+                        <rect x="108" y="45" width="22" height="12" rx="6" fill="#A8E6CF" class="robot-eye right-eye"/>
+                        <rect x="85" y="65" width="30" height="4" rx="2" fill="#A8E6CF" class="robot-mouth"/>
+                        <rect x="80" y="8" width="40" height="15" rx="5" fill="#4A90D9" stroke="#2C5F8A" stroke-width="2"/>
+                        <circle cx="100" cy="6" r="4" fill="#A8E6CF" class="robot-antenna"/>
+                        <!-- Robot Neck -->
+                        <rect x="88" y="90" width="24" height="15" rx="4" fill="#3A7BC8"/>
+                        <!-- Robot Body -->
+                        <rect x="45" y="105" width="110" height="90" rx="15" fill="#4A90D9" stroke="#2C5F8A" stroke-width="2"/>
+                        <circle cx="100" cy="140" r="15" fill="none" stroke="#A8E6CF" stroke-width="2" class="robot-core"/>
+                        <circle cx="100" cy="140" r="6" fill="#A8E6CF" class="robot-core-inner"/>
+                        <rect x="60" y="165" width="80" height="8" rx="4" fill="#3A7BC8"/>
+                        <!-- Robot Arms -->
+                        <rect x="20" y="110" width="22" height="60" rx="10" fill="#4A90D9" stroke="#2C5F8A" stroke-width="2" class="robot-arm left-arm"/>
+                        <rect x="158" y="110" width="22" height="60" rx="10" fill="#4A90D9" stroke="#2C5F8A" stroke-width="2" class="robot-arm right-arm"/>
+                        <circle cx="31" cy="175" r="10" fill="#3A7BC8" stroke="#2C5F8A" stroke-width="2"/>
+                        <circle cx="169" cy="175" r="10" fill="#3A7BC8" stroke="#2C5F8A" stroke-width="2"/>
+                        <!-- Robot Legs -->
+                        <rect x="58" y="195" width="28" height="65" rx="12" fill="#4A90D9" stroke="#2C5F8A" stroke-width="2"/>
+                        <rect x="114" y="195" width="28" height="65" rx="12" fill="#4A90D9" stroke="#2C5F8A" stroke-width="2"/>
+                        <rect x="52" y="255" width="40" height="18" rx="8" fill="#3A7BC8" stroke="#2C5F8A" stroke-width="2"/>
+                        <rect x="108" y="255" width="40" height="18" rx="8" fill="#3A7BC8" stroke="#2C5F8A" stroke-width="2"/>
+                    </svg>
+                </div>
+                <h1 class="landing-title">
+                    <span class="title-aria">ARIA</span>
+                    <span class="title-sub">Ethical Dilemmas of a Home Robot</span>
+                </h1>
+                <p class="landing-desc">Step into the Martinez household. A humanoid robot named ARIA serves the family — but every decision it makes carries ethical weight. <strong>You</strong> decide what ARIA should do.</p>
+                <div class="family-intro">
+                    <div class="family-member">
+                        <div class="member-avatar dad">👨</div>
+                        <span>Carlos<br><small>Father, Account Holder</small></span>
+                    </div>
+                    <div class="family-member">
+                        <div class="member-avatar mom">👩</div>
+                        <span>Maria<br><small>Mother</small></span>
+                    </div>
+                    <div class="family-member">
+                        <div class="member-avatar teen">👧</div>
+                        <span>Sofia, 15<br><small>Teenager</small></span>
+                    </div>
+                    <div class="family-member">
+                        <div class="member-avatar kid">👦</div>
+                        <span>Leo, 6<br><small>Young Child</small></span>
+                    </div>
+                    <div class="family-member">
+                        <div class="member-avatar grandma">👵</div>
+                        <span>Abuela Rosa, 78<br><small>Grandmother</small></span>
+                    </div>
+                </div>
+                <button class="btn-start" onclick="startGame()">Begin the Experience</button>
+                <p class="landing-note">8 scenarios · ~15 minutes · No right answers</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCENARIO SCREEN -->
+    <div id="scenario-screen" class="screen">
+        <div class="scenario-header">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="scenario-counter" id="scenario-counter">1 / 8</div>
+        </div>
+
+        <!-- Scene Animation Area -->
+        <div class="scene-container" id="scene-container">
+            <div class="scene-bg" id="scene-bg"></div>
+            <div class="scene-characters" id="scene-characters"></div>
+            <div class="scene-overlay" id="scene-overlay"></div>
+        </div>
+
+        <!-- Scenario Title & Setup -->
+        <div class="scenario-text-area" id="scenario-text-area">
+            <div class="scenario-badge" id="scenario-badge"></div>
+            <h2 class="scenario-title" id="scenario-title"></h2>
+            <div class="scenario-setup" id="scenario-setup"></div>
+        </div>
+
+        <!-- Dilemma & Choices -->
+        <div class="dilemma-area" id="dilemma-area" style="display:none;">
+            <div class="dilemma-trigger" id="dilemma-trigger"></div>
+            <div class="choices-container" id="choices-container"></div>
+        </div>
+
+        <!-- Consequence Display -->
+        <div class="consequence-area" id="consequence-area" style="display:none;">
+            <div class="consequence-content">
+                <h3 class="consequence-label">What happens next...</h3>
+                <div class="consequence-text" id="consequence-text"></div>
+                <div class="ethical-note" id="ethical-note"></div>
+                <div class="consequence-actions">
+                    <button class="btn-other-choices" id="btn-other-choices" onclick="showOtherChoices()">See Other Choices</button>
+                    <button class="btn-next" id="btn-next" onclick="nextScenario()">Next Scenario →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other Choices Panel -->
+        <div class="other-choices-panel" id="other-choices-panel" style="display:none;">
+            <div class="other-choices-content">
+                <h3>Alternative Choices & Consequences</h3>
+                <div id="other-choices-list"></div>
+                <button class="btn-back" onclick="hideOtherChoices()">← Back to Your Choice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUMMARY SCREEN -->
+    <div id="summary-screen" class="screen">
+        <div class="summary-content">
+            <h1 class="summary-title">Your Ethical Profile</h1>
+            <p class="summary-subtitle">Here's how you navigated ARIA's dilemmas</p>
+            <div class="summary-choices" id="summary-choices"></div>
+            <div class="summary-analysis" id="summary-analysis"></div>
+            <div class="summary-reflection">
+                <h3>Reflection</h3>
+                <p>Every choice you made reflects a real engineering decision that robot builders face today. There are no perfect answers — only tradeoffs between competing values: <strong>safety vs. autonomy</strong>, <strong>privacy vs. functionality</strong>, <strong>fairness vs. efficiency</strong>, and <strong>connection vs. dependency</strong>.</p>
+                <p>The Martinez family is fictional, but the dilemmas are real. As humanoid robots enter our homes — a market projected to reach <strong>$38 billion by 2035</strong> — these choices will affect millions of families.</p>
+                <div class="real-world-data">
+                    <div class="data-point">
+                        <span class="data-number">10-100×</span>
+                        <span class="data-label">Higher false-positive rates for Black and Asian faces in facial recognition (NIST, 2019)</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-number">75%</span>
+                        <span class="data-label">of Americans concerned about companies collecting too much personal data (Pew, 2023)</span>
+                    </div>
+                    <div class="data-point">
+                        <span class="data-number">95%</span>
+                        <span class="data-label">daily engagement rate among elderly companion robot users (ElliQ, 2022)</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-restart" onclick="restartGame()">Experience Again</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
