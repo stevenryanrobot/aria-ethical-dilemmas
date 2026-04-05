@@ -622,11 +622,24 @@ function loadScenario() {
     // Animate intro scene (characters moving, talking)
     s.animateIntro(chars);
 
-    // After extended intro animation, trigger event popup
+    // After intro animations finish, show "click to continue" prompt
     setTimeout(() => {
-        narBar.classList.remove('visible');
-        triggerEvent(s);
-    }, 10000);
+        const prompt = document.createElement('div');
+        prompt.id = 'click-prompt';
+        prompt.innerHTML = '▶ Click anywhere to continue';
+        document.getElementById('room-effects').appendChild(prompt);
+
+        function onClickContinue() {
+            vp.removeEventListener('click', onClickContinue);
+            const p = document.getElementById('click-prompt');
+            if (p) p.remove();
+            narBar.classList.remove('visible');
+            triggerEvent(s);
+        }
+        vp.style.pointerEvents = 'auto';
+        vp.style.cursor = 'pointer';
+        vp.addEventListener('click', onClickContinue);
+    }, 8000);
 }
 
 function triggerEvent(s) {
