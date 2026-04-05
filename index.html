@@ -12,44 +12,12 @@
 <!-- ===== INTRO SCREEN ===== -->
 <div id="intro-screen" class="screen active">
     <div class="intro-bg">
-        <div class="intro-house">
-            <div class="intro-roof"></div>
-            <div class="intro-walls">
-                <div class="intro-window-left"></div>
-                <div class="intro-door"></div>
-                <div class="intro-window-right"></div>
-            </div>
-        </div>
-        <div class="intro-robot-wrap">
-            <div class="robot-character intro-robot">
-                <div class="robot-head">
-                    <div class="robot-antenna"><div class="antenna-ball"></div></div>
-                    <div class="robot-face">
-                        <div class="robot-eye left"></div>
-                        <div class="robot-eye right"></div>
-                        <div class="robot-mouth"></div>
-                    </div>
-                </div>
-                <div class="robot-body">
-                    <div class="robot-chest-light"></div>
-                </div>
-                <div class="robot-arm left-arm"></div>
-                <div class="robot-arm right-arm"></div>
-                <div class="robot-leg left-leg"></div>
-                <div class="robot-leg right-leg"></div>
-            </div>
-        </div>
         <div class="intro-content">
+            <div class="intro-robot-wrap" id="intro-robot-anim"></div>
             <h1><span class="glow">ARIA</span></h1>
             <p class="intro-tagline">Home Robot Simulator</p>
             <p class="intro-desc">Meet the Martinez family and their humanoid home robot.<br>Every decision carries ethical weight. You decide what ARIA does.</p>
-            <div class="family-strip">
-                <div class="family-chip"><span class="chip-emoji">👨</span> Carlos<small>Father</small></div>
-                <div class="family-chip"><span class="chip-emoji">👩</span> Maria<small>Mother</small></div>
-                <div class="family-chip"><span class="chip-emoji">👧🏻</span> Sofia, 15<small>Teenager</small></div>
-                <div class="family-chip"><span class="chip-emoji">👦🏻</span> Leo, 6<small>Child</small></div>
-                <div class="family-chip"><span class="chip-emoji">👵🏻</span> Abuela Rosa<small>Grandmother</small></div>
-            </div>
+            <div class="family-strip" id="family-strip"></div>
             <button class="btn-play" onclick="startGame()">
                 <span class="play-icon">▶</span> START
             </button>
@@ -58,53 +26,53 @@
     </div>
 </div>
 
+<!-- ===== STORY INTRO OVERLAY ===== -->
+<div id="story-intro" class="screen">
+    <div class="story-bg">
+        <div class="story-content">
+            <div class="story-chapter" id="story-chapter"></div>
+            <h2 class="story-title" id="story-title"></h2>
+            <p class="story-text" id="story-text"></p>
+            <div class="story-time" id="story-time"></div>
+        </div>
+    </div>
+</div>
+
 <!-- ===== GAME SCREEN ===== -->
 <div id="game-screen" class="screen">
-    <!-- HUD -->
     <div class="hud">
         <div class="hud-left">
             <div class="hud-scenario" id="hud-scenario">Scenario 1/8</div>
-            <div class="hud-title" id="hud-title">Loading...</div>
+            <div class="hud-title" id="hud-title"></div>
         </div>
         <div class="hud-right">
-            <div class="hud-progress">
-                <div class="hud-progress-fill" id="hud-progress-fill"></div>
-            </div>
+            <div class="hud-progress"><div class="hud-progress-fill" id="hud-progress-fill"></div></div>
             <div class="hud-theme" id="hud-theme"></div>
         </div>
     </div>
-
-    <!-- ROOM SCENE (full screen animated) -->
     <div class="room-viewport" id="room-viewport">
-        <!-- Room background layers -->
         <div class="room-bg" id="room-bg"></div>
-        <!-- Furniture layer -->
         <div class="room-furniture" id="room-furniture"></div>
-        <!-- Characters layer -->
         <div class="room-characters" id="room-characters"></div>
-        <!-- Effects layer -->
         <div class="room-effects" id="room-effects"></div>
-        <!-- Narration bar at bottom -->
         <div class="narration-bar" id="narration-bar">
             <div class="narration-text" id="narration-text"></div>
         </div>
     </div>
-
-    <!-- EVENT POPUP (appears when dilemma triggers) -->
+    <!-- EVENT POPUP -->
     <div class="event-overlay" id="event-overlay">
         <div class="event-popup" id="event-popup">
-            <div class="event-icon" id="event-icon">⚠️</div>
+            <div class="event-icon" id="event-icon"></div>
             <div class="event-label" id="event-label">ETHICAL DILEMMA</div>
             <h2 class="event-title" id="event-title"></h2>
             <p class="event-desc" id="event-desc"></p>
             <div class="event-choices" id="event-choices"></div>
         </div>
     </div>
-
-    <!-- CONSEQUENCE OVERLAY -->
+    <!-- CONSEQUENCE -->
     <div class="consequence-overlay" id="consequence-overlay">
         <div class="consequence-popup">
-            <div class="consequence-header" id="consequence-header">CONSEQUENCE</div>
+            <div class="consequence-header" id="consequence-header"></div>
             <div class="consequence-body" id="consequence-body"></div>
             <div class="consequence-ethics" id="consequence-ethics"></div>
             <div class="consequence-buttons">
@@ -113,8 +81,7 @@
             </div>
         </div>
     </div>
-
-    <!-- ALTERNATIVES OVERLAY -->
+    <!-- ALTERNATIVES -->
     <div class="alt-overlay" id="alt-overlay">
         <div class="alt-popup">
             <h3>What Could Have Happened</h3>
@@ -143,6 +110,7 @@
     </div>
 </div>
 
+<script src="characters.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

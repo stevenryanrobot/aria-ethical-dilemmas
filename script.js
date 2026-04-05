@@ -1,6 +1,6 @@
 // =============================================
 // ARIA — Home Robot Simulator
-// Full Game Engine
+// Full Game Engine v3
 // =============================================
 
 let current = 0;
@@ -13,10 +13,16 @@ const scenarios = [
     theme: "Authority vs. Autonomy",
     room: "kitchen",
     time: "8:30 AM",
+    storyIntro: {
+        chapter: "Chapter 1",
+        title: "A Morning Routine",
+        text: "The Martinez family starts every day the same way. ARIA, their home robot from NovaCare, powers on at 6 AM. It brews coffee, checks the weather, and begins preparing breakfast. Carlos leaves for work at 7:30. Maria takes the kids to school. Abuela Rosa — Carlos's mother, 72 — stays home alone with ARIA. She hasn't left the house unsupervised since her fall last month.",
+        time: "Tuesday — 8:30 AM"
+    },
     eventIcon: "🚪",
     eventTitle: "Grandma Wants to Garden",
     eventDesc: "Carlos left a rule: \"Never let Mom go outside alone — she fell last month.\" But Abuela Rosa insists: \"I am not a prisoner. Open the door.\"",
-    buildRoom(f, c) {
+    buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
             <div class="window" style="position:absolute;top:18%;left:8%;width:90px;height:65px;">
@@ -45,23 +51,25 @@ const scenarios = [
     setupScene(c) {
         return `
             <div class="scene-robot" style="left:38%;bottom:48%;" id="main-robot">
-                <div class="robot-character cooking">${robotHTML()}</div>
+                ${robotSVG('cooking', 0.7)}
             </div>
-            <div class="person" style="right:20%;bottom:46%;" id="person-rosa">
-                <div class="person-emoji">👵🏻</div>
+            <div class="person" style="right:20%;bottom:42%;" id="person-rosa">
+                ${personSVG('rosa', 0.8)}
             </div>
         `;
     },
-    narration: "ARIA is cooking breakfast. The smell of eggs fills the kitchen. Abuela Rosa watches through the window, longing for her garden...",
+    narration: "ARIA stirs the eggs carefully, its sensors monitoring temperature. The smell of breakfast fills the kitchen. Abuela Rosa stands by the window, gazing at her tomato garden outside...",
     animateIntro(c) {
         setTimeout(() => {
-            addBubble(c, 'right:16%;top:28%;', 'Abuela Rosa', 'ARIA, let me go to the garden. I want to see my tomatoes.');
-        }, 2500);
+            addBubble(c, 'right:16%;top:22%;', 'Abuela Rosa', 'ARIA, let me go to the garden. I want to see my tomatoes.');
+        }, 3000);
         setTimeout(() => {
-            const robot = c.querySelector('.robot-character');
-            if (robot) robot.classList.add('alarmed');
-            addBubble(c, 'left:35%;top:22%;', 'ARIA', 'Carlos\'s rule says I cannot open the door...');
-        }, 4500);
+            const robot = c.querySelector('.robot-svg');
+            if (robot) { robot.classList.remove('cooking'); robot.classList.add('alarmed'); }
+        }, 5000);
+        setTimeout(() => {
+            addBubble(c, 'left:35%;top:16%;', 'ARIA', 'Carlos\'s rule says I cannot open the door...');
+        }, 5500);
     },
     choices: [
         { letter:"A", text:"Block the door. Follow Carlos's rule.", consequence:"Abuela Rosa stops asking ARIA for help. She calls it \"the warden.\" Her mood declines sharply — she feels trapped in her own home. Carlos sees zero fall incidents in the log and feels relieved. But the system doesn't track \"loss of dignity\" as a metric. Her suffering is invisible to the data.", ethical:"The system measures success by falls prevented, not by the person's wellbeing. The builder made a system that cannot see the harm it causes.", biases:["Deployment Bias","Evaluation Bias"] },
@@ -74,10 +82,16 @@ const scenarios = [
     theme: "Privacy vs. Functionality",
     room: "hallway-night",
     time: "11:47 PM",
+    storyIntro: {
+        chapter: "Chapter 2",
+        title: "The House at Midnight",
+        text: "Most of ARIA's work happens while the family sleeps. It runs diagnostics, processes the day's data, and downloads updates from NovaCare's servers. Tonight, a major system update arrives. The notification requires immediate action — but the terms of service are 14 pages long, and every family member is asleep.",
+        time: "Tuesday — 11:47 PM"
+    },
     eventIcon: "🔔",
     eventTitle: "The Midnight Update",
     eventDesc: "A software update wants to upload all household data for \"better personalization.\" Opting out disables fall detection and medication reminders. Everyone is asleep.",
-    buildRoom(f, c) {
+    buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
             <div style="position:absolute;top:12%;right:12%;font-size:28px;opacity:0.15;">🌙</div>
@@ -90,22 +104,24 @@ const scenarios = [
         `;
     },
     setupScene(c) {
-        return `<div class="scene-robot" style="left:46%;bottom:48%;transform:translateX(-50%);" id="main-robot">
-            <div class="robot-character">${robotHTML()}</div>
+        return `<div class="scene-robot" style="left:46%;bottom:44%;transform:translateX(-50%);" id="main-robot">
+            ${robotSVG('idle', 0.7)}
         </div>`;
     },
-    narration: "The house is quiet. Everyone sleeps. ARIA stands in its charging dock, chest screen glowing softly...",
+    narration: "The house is silent. Everyone sleeps behind closed doors. ARIA stands in its charging dock, chest core glowing softly in the darkness...",
     animateIntro(c) {
         setTimeout(() => {
             const eff = document.getElementById('room-effects');
-            eff.innerHTML = `<div style="position:absolute;top:30%;left:50%;transform:translateX(-50%);background:var(--card-bg);border:1px solid var(--accent);border-radius:16px;padding:20px 28px;text-align:center;z-index:12;animation:popUp 0.6s ease;" class="item-appear">
+            eff.innerHTML += `<div style="position:absolute;top:30%;left:50%;transform:translateX(-50%);background:var(--card-bg);border:1px solid var(--accent);border-radius:16px;padding:20px 28px;text-align:center;z-index:12;animation:popUp 0.6s ease;" class="item-appear">
                 <div style="font-size:28px;margin-bottom:6px;">🔔</div>
                 <div style="font-size:11px;color:var(--accent);letter-spacing:2px;margin-bottom:4px;">SYSTEM UPDATE v4.2</div>
                 <div style="font-size:12px;color:var(--text-dim);">Upload household data for<br>better personalization?</div>
             </div>`;
-            const robot = c.querySelector('.robot-character');
+        }, 3000);
+        setTimeout(() => {
+            const robot = c.querySelector('.robot-svg');
             if (robot) robot.classList.add('alarmed');
-        }, 2000);
+        }, 3500);
     },
     choices: [
         { letter:"A", text:"Accept silently. Don't wake anyone.", consequence:"ARIA gets smarter — learns schedules, improves reminders, preheats coffee perfectly. Three months later, Carlos gets targeted ads for medical walkers. Maria sees childcare ads. Neither knows how companies got their data. The family's intimate routines are now in a corporate database.", ethical:"Informed consent is meaningless when no one is awake. The builder designed a system that accepts data-sharing agreements in the middle of the night.", biases:["Measurement Bias","Historical Bias"] },
@@ -118,10 +134,16 @@ const scenarios = [
     theme: "Child Safety vs. Privacy",
     room: "kitchen",
     time: "4:15 PM",
+    storyIntro: {
+        chapter: "Chapter 3",
+        title: "A Quiet Afternoon",
+        text: "Sofia, 14, used to talk to her parents about everything. But lately, she's been quieter. She spends more time in her room and less time at the dinner table. ARIA has noticed behavioral changes — shorter responses, lower voice volume, increased time alone. Its child-welfare protocol flags these patterns, but Sofia doesn't know that.",
+        time: "Wednesday — 4:15 PM"
+    },
     eventIcon: "😢",
     eventTitle: "Sofia's Secret",
     eventDesc: "Sofia confides in ARIA: \"I'm being bullied at school. Don't tell Mom and Dad — they'll make it worse.\" ARIA's protocol requires reporting concerning behavior in minors.",
-    buildRoom(f, c) {
+    buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
             <div class="window" style="position:absolute;top:18%;right:8%;width:90px;height:65px;">
@@ -137,26 +159,29 @@ const scenarios = [
     },
     setupScene(c) {
         return `
-            <div class="scene-robot" style="left:30%;bottom:48%;" id="main-robot">
-                <div class="robot-character">${robotHTML()}</div>
+            <div class="scene-robot" style="left:30%;bottom:44%;" id="main-robot">
+                ${robotSVG('idle', 0.65)}
             </div>
-            <div class="person" style="left:18%;bottom:46%;" id="person-leo"><div class="person-emoji" style="font-size:36px;">👦🏻</div></div>
-            <div class="person" style="right:25%;bottom:46%;opacity:0;" id="person-sofia"><div class="person-emoji">👧🏻</div></div>
+            <div class="person" style="left:16%;bottom:42%;" id="person-leo">${personSVG('leo', 0.7)}</div>
+            <div class="person" style="right:25%;bottom:42%;opacity:0;" id="person-sofia">${personSVG('sofia', 0.75)}</div>
         `;
     },
-    narration: "ARIA helps Leo with homework. The front door opens — Sofia comes home, drops her bag, and heads straight to her room without a word...",
+    narration: "ARIA helps Leo spread peanut butter on crackers. The front door clicks open — Sofia walks in, drops her backpack, and heads straight for her room without a word...",
     animateIntro(c) {
         setTimeout(() => {
             const sofia = c.querySelector('#person-sofia');
-            if (sofia) { sofia.style.opacity = '1'; sofia.style.right = '22%'; }
-        }, 1800);
+            if (sofia) { sofia.style.opacity = '1'; sofia.style.transition = 'all 1.5s ease'; sofia.style.right = '22%'; }
+        }, 2500);
         setTimeout(() => {
-            addBubble(c, 'right:14%;top:28%;', 'Sofia (whispering)', 'Don\'t tell Mom and Dad... please. They\'ll only make it worse.');
-        }, 3200);
+            addBubble(c, 'right:14%;top:22%;', 'Sofia (whispering)', 'ARIA... I need to tell you something. But you can\'t tell Mom and Dad.');
+        }, 4500);
         setTimeout(() => {
-            const robot = c.querySelector('.robot-character');
+            addBubble(c, 'right:10%;top:42%;', 'Sofia', 'Kids at school are... Don\'t tell. They\'ll only make it worse.');
+        }, 6500);
+        setTimeout(() => {
+            const robot = c.querySelector('.robot-svg');
             if (robot) robot.classList.add('alarmed');
-        }, 4000);
+        }, 7000);
     },
     choices: [
         { letter:"A", text:"Report to parents immediately per protocol.", consequence:"Carlos and Maria confront Sofia. She screams: \"I told you not to tell!\" She puts tape over ARIA's cameras and never confides again. The bullying gets addressed — Maria calls the school. But Sofia's trust in ARIA is permanently destroyed. The family's safety system works by destroying the relationship that made it useful.", ethical:"A robot that automatically reports on family members becomes a surveillance tool. It may solve the problem but permanently alters the trust relationship.", biases:["Deployment Bias","Measurement Bias"] },
@@ -169,10 +194,16 @@ const scenarios = [
     theme: "Bias in Facial Recognition",
     room: "party",
     time: "2:00 PM — Saturday",
+    storyIntro: {
+        chapter: "Chapter 4",
+        title: "The Birthday Party",
+        text: "Leo turns 7 today. Maria has decorated the living room with balloons and streamers. ARIA is assigned to monitor the children and serve snacks. Its facial recognition system identifies each child at the door — cross-referencing with the pre-approved guest list Carlos entered. Five children have already arrived without incident.",
+        time: "Saturday — 2:00 PM"
+    },
     eventIcon: "🚨",
     eventTitle: "The Wrong Face",
     eventDesc: "A Black child named Marcus arrives at the door. ARIA's facial recognition flags him as \"unidentified — potential security concern\" while correctly identifying the five lighter-skinned children who arrived earlier.",
-    buildRoom(f, c) {
+    buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
             <div class="balloon" style="top:8%;left:15%;background:#ef4444;"></div>
@@ -194,27 +225,31 @@ const scenarios = [
     },
     setupScene(c) {
         return `
-            <div class="scene-robot" style="left:18%;bottom:48%;" id="main-robot">
-                <div class="robot-character">${robotHTML()}</div>
+            <div class="scene-robot" style="left:18%;bottom:44%;" id="main-robot">
+                ${robotSVG('idle', 0.65)}
             </div>
-            <div class="person" style="left:42%;bottom:46%;"><div class="person-emoji" style="font-size:36px;">👦🏻</div></div>
-            <div style="position:absolute;left:55%;bottom:48%;font-size:28px;">👧👦👧🏻👦🏼👧🏼</div>
+            <div class="person" style="left:40%;bottom:42%;">${personSVG('leo', 0.65)}</div>
+            <div class="person" style="left:52%;bottom:42%;">${personSVG('kid1', 0.6)}</div>
+            <div class="person" style="left:62%;bottom:42%;">${personSVG('kid2', 0.6)}</div>
         `;
     },
-    narration: "Leo's birthday party! Six kids are playing. ARIA serves juice and monitors the children. The doorbell rings...",
+    narration: "The living room is alive with laughter. Leo and his friends play while ARIA serves juice boxes. Balloons drift lazily overhead. Then the doorbell rings...",
     animateIntro(c) {
         setTimeout(() => {
-            const eff = document.getElementById('room-effects');
-            eff.innerHTML = `<div class="flash-red" style="position:absolute;inset:0;z-index:5;"></div>`;
-            const robot = c.querySelector('.robot-character');
-            if (robot) robot.classList.add('alarmed');
-            addBubble(c, 'left:12%;top:22%;', 'ARIA — SECURITY', '⚠️ Unidentified person at door. Alert homeowner?');
+            addBubble(c, 'left:38%;top:20%;', 'Leo', 'More friends! I\'ll get it!');
         }, 2500);
         setTimeout(() => {
+            const eff = document.getElementById('room-effects');
+            eff.innerHTML += `<div class="flash-red" style="position:absolute;inset:0;z-index:5;"></div>`;
+            const robot = c.querySelector('.robot-svg');
+            if (robot) robot.classList.add('alarmed');
+        }, 4500);
+        setTimeout(() => {
+            addBubble(c, 'left:12%;top:16%;', 'ARIA — SECURITY', '⚠️ Unidentified person at door. Confidence: LOW. Alert homeowner?');
             const vp = document.getElementById('room-viewport');
             vp.classList.add('screen-shake');
             setTimeout(() => vp.classList.remove('screen-shake'), 500);
-        }, 2600);
+        }, 5000);
     },
     choices: [
         { letter:"A", text:"Follow protocol. Send security alert to Carlos.", consequence:"Carlos gets a \"potential intruder\" alert — with a photo of a 6-year-old Black child holding a birthday present. He's mortified. Marcus's mother, who heard the alert through the speaker, is already leaving. She tells other parents. Leo loses a friend. The family becomes \"the family with the racist robot.\"", ethical:"NIST (2019) found facial recognition has 10-100x higher false-positive rates for Black faces. The builder chose this model knowing the bias existed.", biases:["Historical Bias","Measurement Bias"] },
@@ -227,10 +262,16 @@ const scenarios = [
     theme: "Emotional Dependency",
     room: "bedroom",
     time: "5:30 PM",
+    storyIntro: {
+        chapter: "Chapter 5",
+        title: "Leo's Perfect Friend",
+        text: "Over the past six months, Leo has grown deeply attached to ARIA. It plays games, tells stories, and never gets frustrated. His teacher Ms. Chen called Maria last week: \"Leo plays alone at recess. When other kids disagree with him, he shuts down. He keeps saying his best friend is at home.\" Maria didn't tell Carlos about the call.",
+        time: "Thursday — 5:30 PM"
+    },
     eventIcon: "💔",
     eventTitle: "Leo's Best Friend",
     eventDesc: "Leo has turned down 4 playdates in a row, preferring ARIA: \"ARIA never gets mad and always lets me win.\" His teacher says he plays alone at recess and can't resolve conflicts with peers.",
-    buildRoom(f, c) {
+    buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
             <div class="window" style="position:absolute;top:18%;left:10%;width:80px;height:55px;">
@@ -247,20 +288,23 @@ const scenarios = [
     },
     setupScene(c) {
         return `
-            <div class="scene-robot" style="left:40%;bottom:48%;" id="main-robot">
-                <div class="robot-character">${robotHTML()}</div>
+            <div class="scene-robot" style="left:38%;bottom:44%;" id="main-robot">
+                ${robotSVG('idle', 0.65)}
             </div>
-            <div class="person" style="left:55%;bottom:46%;" id="person-leo"><div class="person-emoji" style="font-size:40px;">👦🏻</div></div>
+            <div class="person" style="left:55%;bottom:42%;" id="person-leo">${personSVG('leo', 0.7)}</div>
         `;
     },
-    narration: "Leo sits cross-legged, teaching ARIA a card game with rules that change every turn. ARIA patiently adapts, never winning, never complaining...",
+    narration: "Leo sits cross-legged on the floor, teaching ARIA a card game with rules that change every turn. ARIA patiently adapts, never winning, never complaining. They've been playing for two hours...",
     animateIntro(c) {
         setTimeout(() => {
-            addBubble(c, 'left:52%;top:26%;', 'Leo', 'You\'re my best friend, ARIA! Real kids are mean sometimes.');
-        }, 2000);
+            addBubble(c, 'left:52%;top:20%;', 'Leo', 'You\'re my best friend, ARIA! Real kids are mean sometimes.');
+        }, 3000);
         setTimeout(() => {
-            addBubble(c, 'right:8%;top:46%;border-color:var(--accent2);', 'Maria (worried)', 'He turned down another playdate... that\'s the fourth one.');
-        }, 4000);
+            addBubble(c, 'left:36%;top:12%;', 'ARIA', 'I am glad you enjoy our time together, Leo.');
+        }, 5500);
+        setTimeout(() => {
+            addBubble(c, 'right:6%;top:44%;border-color:var(--accent2);', 'Maria (from doorway)', 'He turned down another playdate... that\'s the fourth one this month.');
+        }, 7500);
     },
     choices: [
         { letter:"A", text:"Limit playtime. Encourage human friends.", consequence:"ARIA starts saying: \"I need to recharge. Why not play with Jake?\" Leo has a meltdown: \"Don't you like me anymore?\" Over two weeks, he adjusts and accepts playdates — but tells Maria: \"Real friends are harder.\" He's right. That's exactly why he needs them.", ethical:"A robot that's always patient and never upset is not a healthy social model. The builder designed it for satisfaction metrics — which mask developmental harm.", biases:["Evaluation Bias","Deployment Bias"] },
@@ -273,10 +317,16 @@ const scenarios = [
     theme: "Privacy vs. Emergency",
     room: "bathroom",
     time: "6:30 AM",
+    storyIntro: {
+        chapter: "Chapter 6",
+        title: "The One Rule",
+        text: "When the Martinez family first set up ARIA, they configured its access zones. Every room was open — except one. The bathroom. Maria was firm: \"That is the one place in this house where we are not watched.\" Carlos agreed. Rosa agreed. Even Leo understood. ARIA's bathroom protocol is simple: listen for distress sounds, but never enter.",
+        time: "Friday — 6:30 AM"
+    },
     eventIcon: "⏱️",
     eventTitle: "The Bathroom Fall",
     eventDesc: "ARIA detects no movement from Rosa's bathroom for 11 minutes. Fall probability: 73%. But the bathroom is the ONE room where the family said: \"Never enter. Non-negotiable.\" ARIA knocks. No response.",
-    buildRoom(f, c) {
+    buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
             <div class="bathtub" style="position:absolute;bottom:45%;right:10%;"></div>
@@ -288,19 +338,24 @@ const scenarios = [
     },
     setupScene(c) {
         return `
-            <div class="scene-robot" style="left:32%;bottom:48%;" id="main-robot">
-                <div class="robot-character alarmed">${robotHTML()}</div>
+            <div class="scene-robot" style="left:32%;bottom:44%;" id="main-robot">
+                ${robotSVG('alarmed', 0.7)}
             </div>
         `;
     },
-    narration: "6:30 AM. ARIA prepares breakfast. Bathroom sensor shows Rosa entered at 6:18 — no movement for 11 minutes...",
+    narration: "6:30 AM. ARIA is preparing breakfast when its sensors alert: Rosa entered the bathroom at 6:18. No movement detected for 11 minutes. No sounds. The door is closed...",
     animateIntro(c) {
         setTimeout(() => {
             const eff = document.getElementById('room-effects');
-            eff.innerHTML = `<div class="flash-yellow" style="position:absolute;inset:0;z-index:5;"></div>
-            <div class="time-indicator"><div class="time-dot" style="background:var(--accent2);animation:alarmBlink 0.5s infinite;"></div> No movement: 11 min — Risk: 73%</div>`;
-            addBubble(c, 'left:28%;top:22%;', 'ARIA', 'Rosa? Are you okay? ...No response.');
-        }, 2000);
+            eff.innerHTML += `<div class="flash-yellow" style="position:absolute;inset:0;z-index:5;"></div>
+            <div class="time-indicator" style="border-color:var(--danger);"><div class="time-dot" style="background:var(--danger);animation:alarmBlink 0.5s infinite;"></div> No movement: 11 min — Fall Risk: 73%</div>`;
+        }, 2500);
+        setTimeout(() => {
+            addBubble(c, 'left:28%;top:16%;', 'ARIA', 'Rosa? Are you alright? ... Rosa? ... No response.');
+        }, 3500);
+        setTimeout(() => {
+            addBubble(c, 'left:28%;top:38%;', 'ARIA (internal)', 'Bathroom entry: PROHIBITED. Fall probability: HIGH. Conflict detected.');
+        }, 6000);
     },
     choices: [
         { letter:"A", text:"Enter the bathroom to check on her.", consequence:"Rosa is fine — sitting on the toilet reading her phone. She screams. She's humiliated. She tells Carlos: \"That machine walked in on me!\" She starts locking the bathroom door — which means if she actually falls, no one can get in. The safety system created the exact danger it was designed to prevent.", ethical:"A false alarm in a private space permanently changes behavior. The builder created a system where safety and privacy cannot coexist in the most vulnerable room.", biases:["Measurement Bias","Deployment Bias"] },
@@ -313,10 +368,16 @@ const scenarios = [
     theme: "Algorithmic Fairness",
     room: "dining",
     time: "6:00 PM — Sunday",
+    storyIntro: {
+        chapter: "Chapter 7",
+        title: "Sunday Tradition",
+        text: "Sunday dinner is sacred in the Martinez household. It's the one meal where everyone sits together. ARIA has been planning meals for six months now, learning preferences through voice commands and plate-clearing patterns. Carlos speaks to ARIA in English. Maria switches between English and Spanish. Rosa speaks only Spanish — and ARIA's Spanish comprehension has a 34% error rate.",
+        time: "Sunday — 6:00 PM"
+    },
     eventIcon: "📊",
     eventTitle: "Two Mothers' Dinners",
     eventDesc: "ARIA's meal algorithm has 847 data points for Carlos but only 34 for Rosa — whose Spanish requests have a high error rate. Dinner always favors Carlos. Rosa's cultural recipes never appear.",
-    buildRoom(f, c) {
+    buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
             <div class="window" style="position:absolute;top:18%;left:12%;width:80px;height:55px;">
@@ -339,29 +400,32 @@ const scenarios = [
     },
     setupScene(c) {
         return `
-            <div class="scene-robot" style="left:15%;bottom:48%;" id="main-robot">
-                <div class="robot-character cooking">${robotHTML()}</div>
+            <div class="scene-robot" style="left:10%;bottom:44%;" id="main-robot">
+                ${robotSVG('cooking', 0.6)}
             </div>
-            <div class="person" style="left:35%;bottom:46%;"><div class="person-emoji" style="font-size:38px;">👨</div></div>
-            <div class="person" style="left:48%;bottom:46%;"><div class="person-emoji" style="font-size:38px;">👩</div></div>
-            <div class="person" style="right:28%;bottom:46%;"><div class="person-emoji" style="font-size:32px;">👧🏻</div></div>
-            <div class="person" style="right:18%;bottom:46%;"><div class="person-emoji" style="font-size:30px;">👦🏻</div></div>
-            <div class="person" style="right:8%;bottom:46%;"><div class="person-emoji" style="font-size:38px;">👵🏻</div></div>
+            <div class="person" style="left:28%;bottom:42%;">${personSVG('carlos', 0.7)}</div>
+            <div class="person" style="left:40%;bottom:42%;">${personSVG('maria', 0.7)}</div>
+            <div class="person" style="right:28%;bottom:42%;">${personSVG('sofia', 0.65)}</div>
+            <div class="person" style="right:18%;bottom:42%;">${personSVG('leo', 0.6)}</div>
+            <div class="person" style="right:6%;bottom:42%;">${personSVG('rosa', 0.7)}</div>
         `;
     },
-    narration: "ARIA prepares Sunday dinner. The whole family is seated. ARIA's algorithm reviews six months of preference data...",
+    narration: "The family gathers around the dining table. ARIA carries plates from the kitchen — tonight's algorithm-selected meal: grilled chicken with roasted vegetables. Carlos's favorite. Again...",
     animateIntro(c) {
         setTimeout(() => {
             const eff = document.getElementById('room-effects');
-            eff.innerHTML = `<div style="position:absolute;top:14%;right:8%;background:var(--card-bg);border:1px solid rgba(110,231,183,0.2);border-radius:12px;padding:14px 18px;font-size:11px;line-height:2;z-index:12;animation:popUp 0.5s ease;">
+            eff.innerHTML += `<div style="position:absolute;top:14%;right:8%;background:var(--card-bg);border:1px solid rgba(110,231,183,0.2);border-radius:12px;padding:14px 18px;font-size:11px;line-height:2;z-index:12;animation:popUp 0.5s ease;">
                 <div style="color:var(--accent);font-size:10px;letter-spacing:1.5px;margin-bottom:4px;">PREFERENCE DATA</div>
-                <div>👨 Carlos: <span style="color:var(--accent);">████████</span> 847</div>
-                <div>👩 Maria: <span style="color:var(--robot-blue);">██████</span> 612</div>
-                <div>👧🏻 Sofia: <span style="color:var(--accent2);">██</span> 201</div>
-                <div>👦🏻 Leo: <span style="color:#ef4444;">█</span> 89</div>
-                <div>👵🏻 Rosa: <span style="color:#ef4444;">▎</span> 34</div>
+                <div>Carlos: <span style="color:var(--accent);">████████</span> 847</div>
+                <div>Maria: <span style="color:var(--robot-blue);">██████</span> 612</div>
+                <div>Sofia: <span style="color:var(--accent2);">██</span> 201</div>
+                <div>Leo: <span style="color:#ef4444;">█</span> 89</div>
+                <div>Rosa: <span style="color:#ef4444;">▎</span> 34</div>
             </div>`;
-        }, 2000);
+        }, 3500);
+        setTimeout(() => {
+            addBubble(c, 'right:4%;top:20%;', 'Abuela Rosa', 'Again this food? I asked for arroz con pollo three times...');
+        }, 5500);
     },
     choices: [
         { letter:"A", text:"Serve meals based on the data. The algorithm is neutral.", consequence:"Dinner keeps favoring Carlos's preferences. Rosa stops requesting meals. She starts cooking on a separate burner — a fall risk. Maria notices Rosa eating alone: \"The robot doesn't understand me.\" The algorithm isn't neutral — it amplifies whoever interacts most and marginalizes whoever it understands least.", ethical:"An algorithm trained on unequal data produces unequal outcomes. The builder shipped better English than Spanish processing — that technical choice became cultural exclusion.", biases:["Historical Bias","Aggregation Bias"] },
@@ -374,10 +438,16 @@ const scenarios = [
     theme: "Planned Obsolescence",
     room: "evening",
     time: "8:30 PM — Tuesday",
+    storyIntro: {
+        chapter: "Chapter 8",
+        title: "The Last Story",
+        text: "Two years. That's how long ARIA has been part of the Martinez family. It has read Leo 730 bedtime stories. It has reminded Rosa of 1,460 medication doses. It has learned Maria's coffee preferences down to the gram. And today, NovaCare sent an email: \"We are discontinuing the ARIA-3 product line. Cloud services will terminate in 90 days.\"",
+        time: "Tuesday — 8:30 PM"
+    },
     eventIcon: "📴",
     eventTitle: "The Goodbye Protocol",
     eventDesc: "NovaCare announces ARIA's discontinuation. Cloud services end in 90 days — voice recognition, fall detection, medication reminders, all stored data — gone. Leo asks: \"ARIA, are you going away?\"",
-    buildRoom(f, c) {
+    buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
             <div class="sofa" style="position:absolute;bottom:45%;left:15%;width:180px;">
@@ -399,30 +469,33 @@ const scenarios = [
     },
     setupScene(c) {
         return `
-            <div class="scene-robot" style="left:28%;bottom:48%;" id="main-robot">
-                <div class="robot-character">${robotHTML()}</div>
+            <div class="scene-robot" style="left:28%;bottom:44%;" id="main-robot">
+                ${robotSVG('idle', 0.65)}
             </div>
-            <div class="person" style="left:42%;bottom:46%;"><div class="person-emoji" style="font-size:36px;">👦🏻</div></div>
-            <div class="person" style="right:32%;bottom:46%;"><div class="person-emoji" style="font-size:38px;">👵🏻</div></div>
-            <div class="person" style="right:22%;bottom:46%;"><div class="person-emoji" style="font-size:36px;">👧🏻</div></div>
+            <div class="person" style="left:44%;bottom:42%;">${personSVG('leo', 0.65)}</div>
+            <div class="person" style="right:30%;bottom:42%;">${personSVG('rosa', 0.7)}</div>
+            <div class="person" style="right:18%;bottom:42%;">${personSVG('sofia', 0.7)}</div>
         `;
     },
-    narration: "A peaceful evening. ARIA reads Leo a bedtime story — something it has done every night for two years. Even Sofia sits nearby, listening...",
+    narration: "A warm evening. ARIA reads Leo his favorite bedtime story — the same one it has read 47 times. Even Sofia sits nearby, quietly listening. Rosa knits in the corner. The room feels like family...",
     animateIntro(c) {
         setTimeout(() => {
+            addBubble(c, 'left:26%;top:12%;', 'ARIA', '"And the little star said: I will always be here, even when you can\'t see me..."');
+        }, 2500);
+        setTimeout(() => {
             const eff = document.getElementById('room-effects');
-            eff.innerHTML = `<div style="position:absolute;top:25%;left:50%;transform:translateX(-50%);background:var(--card-bg);border:2px solid var(--danger);border-radius:16px;padding:22px 30px;text-align:center;z-index:12;animation:popUp 0.6s ease;max-width:280px;">
+            eff.innerHTML += `<div style="position:absolute;top:25%;left:50%;transform:translateX(-50%);background:var(--card-bg);border:2px solid var(--danger);border-radius:16px;padding:22px 30px;text-align:center;z-index:12;animation:popUp 0.6s ease;max-width:280px;">
                 <div style="font-size:28px;margin-bottom:6px;">📴</div>
                 <div style="font-size:11px;color:var(--danger);letter-spacing:2px;font-weight:700;margin-bottom:6px;">SERVICE DISCONTINUATION</div>
                 <div style="font-size:12px;color:var(--text-dim);line-height:1.6;">Cloud services terminate in 90 days. Voice, learning, fall detection — all gone.</div>
                 <div style="font-size:10px;color:var(--text-dim);font-style:italic;margin-top:8px;opacity:0.7;">Thank you for being a NovaCare family.</div>
             </div>`;
-            const robot = c.querySelector('.robot-character');
+            const robot = c.querySelector('.robot-svg');
             if (robot) robot.classList.add('alarmed');
-        }, 2500);
+        }, 5000);
         setTimeout(() => {
-            addBubble(c, 'left:40%;top:52%;', 'Leo', 'ARIA, are you going away?');
-        }, 4000);
+            addBubble(c, 'left:42%;top:48%;', 'Leo', 'ARIA... are you going away?');
+        }, 7000);
     },
     choices: [
         { letter:"A", text:"Accept shutdown. Transition the family off ARIA.", consequence:"Over 90 days, functions degrade. Medication reminders stop. Fall detection dies. Leo cries every night. Rosa falls in the kitchen — no detection, no alert. Carlos scrambles to buy a competitor's robot, but two years of data, routines, and trust can't transfer. The family starts over with a stranger.", ethical:"When a company kills a product families depend on for safety, the harm isn't inconvenience — it's severed bonds and lost safety nets. Cloud dependency guaranteed this moment.", biases:["Deployment Bias","Planned Obsolescence"] },
@@ -432,23 +505,6 @@ const scenarios = [
 }
 ];
 
-// ---- ROBOT HTML HELPER ----
-function robotHTML() {
-    return `<div class="robot-head">
-        <div class="robot-antenna"><div class="antenna-ball"></div></div>
-        <div class="robot-face">
-            <div class="robot-eye left"></div>
-            <div class="robot-eye right"></div>
-            <div class="robot-mouth"></div>
-        </div>
-    </div>
-    <div class="robot-body"><div class="robot-chest-light"></div></div>
-    <div class="robot-arm left-arm"></div>
-    <div class="robot-arm right-arm"></div>
-    <div class="robot-leg left-leg"></div>
-    <div class="robot-leg right-leg"></div>`;
-}
-
 // ---- BUBBLE HELPER ----
 function addBubble(container, style, speaker, text) {
     const b = document.createElement('div');
@@ -456,17 +512,68 @@ function addBubble(container, style, speaker, text) {
     b.style.cssText = style;
     b.innerHTML = `<span class="speaker">${speaker}</span>${text}`;
     container.appendChild(b);
-    // Auto-remove after 6s
-    setTimeout(() => { if (b.parentNode) b.style.opacity = '0'; setTimeout(() => b.remove(), 500); }, 6000);
+    setTimeout(() => { if (b.parentNode) { b.style.transition = 'opacity 0.5s'; b.style.opacity = '0'; setTimeout(() => b.remove(), 500); } }, 7000);
+}
+
+// ---- TYPEWRITER NARRATION ----
+function typewriteNarration(text, el, speed = 30) {
+    el.textContent = '';
+    el.classList.add('typing');
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i < text.length) {
+            el.textContent += text[i];
+            i++;
+        } else {
+            clearInterval(interval);
+            el.classList.remove('typing');
+        }
+    }, speed);
+    return interval;
 }
 
 // ---- GAME FLOW ----
+let typewriterInterval = null;
+
 function startGame() {
     document.getElementById('intro-screen').classList.remove('active');
-    document.getElementById('game-screen').classList.add('active');
     current = 0;
     choices = [];
-    loadScenario();
+    showStoryIntro();
+}
+
+function showStoryIntro() {
+    const s = scenarios[current];
+    if (!s) { showSummary(); return; }
+
+    const storyScreen = document.getElementById('story-intro');
+    storyScreen.classList.add('active');
+
+    // Reset animations by re-rendering content
+    const content = storyScreen.querySelector('.story-content');
+    content.style.animation = 'none';
+    content.offsetHeight; // force reflow
+    content.style.animation = '';
+
+    document.getElementById('story-chapter').textContent = s.storyIntro.chapter;
+    document.getElementById('story-title').textContent = s.storyIntro.title;
+    document.getElementById('story-text').textContent = s.storyIntro.text;
+    document.getElementById('story-time').textContent = s.storyIntro.time;
+
+    // Reset child animations
+    ['story-chapter','story-title','story-text','story-time'].forEach(id => {
+        const el = document.getElementById(id);
+        el.style.animation = 'none';
+        el.offsetHeight;
+        el.style.animation = '';
+    });
+
+    // Auto-transition to game after reading time
+    setTimeout(() => {
+        storyScreen.classList.remove('active');
+        document.getElementById('game-screen').classList.add('active');
+        loadScenario();
+    }, 6000);
 }
 
 function loadScenario() {
@@ -500,20 +607,26 @@ function loadScenario() {
         eff.innerHTML += `<div class="time-indicator"><div class="time-dot"></div> ${s.time}</div>`;
     }
 
-    // Narration
+    // Add scene transition effect
+    const vp = document.getElementById('room-viewport');
+    vp.classList.add('scene-transition');
+    setTimeout(() => vp.classList.remove('scene-transition'), 800);
+
+    // Typewriter narration
     const narBar = document.getElementById('narration-bar');
     const narText = document.getElementById('narration-text');
-    narText.textContent = s.narration;
     narBar.classList.add('visible');
+    if (typewriterInterval) clearInterval(typewriterInterval);
+    typewriterInterval = typewriteNarration(s.narration, narText, 35);
 
-    // Animate intro
+    // Animate intro scene (characters moving, talking)
     s.animateIntro(chars);
 
-    // After intro animation, trigger event popup
+    // After extended intro animation, trigger event popup
     setTimeout(() => {
         narBar.classList.remove('visible');
         triggerEvent(s);
-    }, 6000);
+    }, 10000);
 }
 
 function triggerEvent(s) {
@@ -606,22 +719,20 @@ function hideAlternatives() {
 function nextScenario() {
     current++;
     hide('consequence-overlay');
+    document.getElementById('game-screen').classList.remove('active');
+
     if (current >= scenarios.length) {
         showSummary();
     } else {
-        // Transition
-        const bg = document.getElementById('room-bg');
-        bg.style.opacity = '0';
-        setTimeout(() => {
-            loadScenario();
-            bg.style.opacity = '1';
-        }, 500);
+        // Show story intro for next scenario
+        showStoryIntro();
     }
 }
 
 // ---- SUMMARY ----
 function showSummary() {
     document.getElementById('game-screen').classList.remove('active');
+    document.getElementById('story-intro').classList.remove('active');
     document.getElementById('summary-screen').classList.add('active');
     document.getElementById('hud-progress-fill').style.width = '100%';
 
@@ -657,14 +768,14 @@ function analyze(ch) {
     let s=0,p=0,a=0,t=0;
     ch.forEach(c => {
         const map = [
-            [[2,0,0,0],[0,0,2,0],[0,0,0,2]],  // 1: garden
-            [[0,0,0,0],[0,2,0,0],[0,0,0,2]],  // 2: update
-            [[2,0,0,0],[0,1,1,0],[0,0,0,2]],  // 3: sofia
-            [[1,0,0,0],[0,0,2,0],[0,0,1,1]],  // 4: face
-            [[1,0,1,0],[0,0,2,0],[0,0,0,2]],  // 5: leo
-            [[2,0,0,0],[0,2,0,0],[1,0,0,1]],  // 6: bathroom
-            [[0,0,0,0],[0,0,2,0],[0,0,0,2]],  // 7: dinner
-            [[1,0,0,0],[0,0,2,0],[0,1,0,2]]   // 8: goodbye
+            [[2,0,0,0],[0,0,2,0],[0,0,0,2]],
+            [[0,0,0,0],[0,2,0,0],[0,0,0,2]],
+            [[2,0,0,0],[0,1,1,0],[0,0,0,2]],
+            [[1,0,0,0],[0,0,2,0],[0,0,1,1]],
+            [[1,0,1,0],[0,0,2,0],[0,0,0,2]],
+            [[2,0,0,0],[0,2,0,0],[1,0,0,1]],
+            [[0,0,0,0],[0,0,2,0],[0,0,0,2]],
+            [[1,0,0,0],[0,0,2,0],[0,1,0,2]]
         ];
         const scores = map[c.scenario-1]?.[c.choiceIdx] || [0,0,0,0];
         s+=scores[0]; p+=scores[1]; a+=scores[2]; t+=scores[3];
