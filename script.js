@@ -568,12 +568,34 @@ function showStoryIntro() {
         el.style.animation = '';
     });
 
-    // Auto-transition to game after reading time
-    setTimeout(() => {
+    // Remove any stale click prompt from a previous run
+    const oldPrompt = document.getElementById('story-click-prompt');
+    if (oldPrompt) oldPrompt.remove();
+
+    // Show "click to continue" prompt after a short delay so the user has time to start reading
+    const promptTimer = setTimeout(() => {
+        if (!storyScreen.classList.contains('active')) return;
+        if (document.getElementById('story-click-prompt')) return;
+        const prompt = document.createElement('div');
+        prompt.id = 'story-click-prompt';
+        prompt.textContent = '▶ Click anywhere to continue';
+        prompt.style.cssText = 'position:absolute;bottom:40px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.85);font-size:14px;letter-spacing:3px;font-weight:600;padding:12px 28px;border:1px solid rgba(255,255,255,0.35);border-radius:30px;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);animation:promptPulse 2s ease-in-out infinite;z-index:20;pointer-events:none;';
+        storyScreen.appendChild(prompt);
+    }, 1500);
+
+    // Wait for user click to advance (no auto-transition)
+    function onStoryClick(e) {
+        storyScreen.removeEventListener('click', onStoryClick);
+        clearTimeout(promptTimer);
+        const p = document.getElementById('story-click-prompt');
+        if (p) p.remove();
         storyScreen.classList.remove('active');
+        storyScreen.style.cursor = '';
         document.getElementById('game-screen').classList.add('active');
         loadScenario();
-    }, 6000);
+    }
+    storyScreen.style.cursor = 'pointer';
+    storyScreen.addEventListener('click', onStoryClick);
 }
 
 function loadScenario() {
