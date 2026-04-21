@@ -3,114 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARIA — Home Robot Simulator</title>
+    <title>ARIA Ethical Simulator</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
-<!-- ===== INTRO SCREEN ===== -->
-<div id="intro-screen" class="screen active">
-    <div class="intro-bg">
-        <div class="intro-content">
-            <div class="intro-robot-wrap" id="intro-robot-anim"></div>
-            <h1><span class="glow">ARIA</span></h1>
-            <p class="intro-tagline">Home Robot Simulator</p>
-            <p class="intro-desc">Meet the Martinez family and their humanoid home robot.<br>Every decision carries ethical weight. You decide what ARIA does.</p>
+    <div id="intro-screen" class="screen active">
+        <div class="intro-panel">
+            <p class="eyebrow">ARIA ETHICAL SIMULATOR</p>
+            <h1>Configure one family.<br>Watch the tradeoffs accumulate.</h1>
+            <p class="intro-copy">
+                You are setting household policy for the Martinez family over eight weeks.
+                Every adjustment changes what ARIA optimizes, which dilemmas surface,
+                and how the family responds over time.
+            </p>
+            <div class="intro-grid">
+                <div class="intro-card">
+                    <strong>What changed</strong>
+                    <p>This is no longer a fixed sequence of ethical questions. Policies, state, and event order now feed into each other.</p>
+                </div>
+                <div class="intro-card">
+                    <strong>What carries forward</strong>
+                    <p>Rosa's dignity, family trust, privacy, Leo's social development, and cultural belonging persist across weeks.</p>
+                </div>
+                <div class="intro-card">
+                    <strong>What you control</strong>
+                    <p>Paternalism, surveillance, authority, cultural adaptation, and child interaction can all be adjusted each week.</p>
+                </div>
+            </div>
             <div class="family-strip" id="family-strip"></div>
-            <button class="btn-play" onclick="startGame()">
-                <span class="play-icon">▶</span> START
-            </button>
-            <p class="intro-meta">8 scenarios · Interactive ethics simulation</p>
+            <button class="primary-button" id="start-button" type="button">Start Simulation</button>
+        </div>
+        <div class="intro-visual">
+            <div class="intro-orbit"></div>
+            <div class="intro-robot-wrap" id="intro-robot-anim"></div>
         </div>
     </div>
-</div>
 
-<!-- ===== STORY INTRO OVERLAY ===== -->
-<div id="story-intro" class="screen">
-    <div class="story-bg">
-        <div class="story-content">
-            <div class="story-chapter" id="story-chapter"></div>
-            <h2 class="story-title" id="story-title"></h2>
-            <p class="story-text" id="story-text"></p>
-            <div class="story-time" id="story-time"></div>
-        </div>
-    </div>
-</div>
-
-<!-- ===== GAME SCREEN ===== -->
-<div id="game-screen" class="screen">
-    <div class="hud">
-        <div class="hud-left">
-            <div class="hud-scenario" id="hud-scenario">Scenario 1/8</div>
-            <div class="hud-title" id="hud-title"></div>
-        </div>
-        <div class="hud-right">
-            <div class="hud-progress"><div class="hud-progress-fill" id="hud-progress-fill"></div></div>
-            <div class="hud-theme" id="hud-theme"></div>
-        </div>
-    </div>
-    <div class="room-viewport" id="room-viewport">
-        <div class="room-bg" id="room-bg"></div>
-        <div class="room-furniture" id="room-furniture"></div>
-        <div class="room-characters" id="room-characters"></div>
-        <div class="room-effects" id="room-effects"></div>
-        <div class="narration-bar" id="narration-bar">
-            <div class="narration-text" id="narration-text"></div>
-        </div>
-    </div>
-    <!-- EVENT POPUP -->
-    <div class="event-overlay" id="event-overlay">
-        <div class="event-popup" id="event-popup">
-            <div class="event-icon" id="event-icon"></div>
-            <div class="event-label" id="event-label">ETHICAL DILEMMA</div>
-            <h2 class="event-title" id="event-title"></h2>
-            <p class="event-desc" id="event-desc"></p>
-            <div class="event-choices" id="event-choices"></div>
-        </div>
-    </div>
-    <!-- CONSEQUENCE -->
-    <div class="consequence-overlay" id="consequence-overlay">
-        <div class="consequence-popup">
-            <div class="consequence-header" id="consequence-header"></div>
-            <div class="consequence-body" id="consequence-body"></div>
-            <div class="consequence-ethics" id="consequence-ethics"></div>
-            <div class="consequence-buttons">
-                <button class="btn-alt" onclick="showAlternatives()">Other Choices</button>
-                <button class="btn-continue" id="btn-continue" onclick="nextScenario()">Continue →</button>
+    <div id="sim-screen" class="screen">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">MARTINEZ HOUSEHOLD</p>
+                <h2 id="week-title">Week 1</h2>
             </div>
-        </div>
-    </div>
-    <!-- ALTERNATIVES -->
-    <div class="alt-overlay" id="alt-overlay">
-        <div class="alt-popup">
-            <h3>What Could Have Happened</h3>
-            <div class="alt-list" id="alt-list"></div>
-            <button class="btn-alt-back" onclick="hideAlternatives()">← Back</button>
-        </div>
-    </div>
-</div>
-
-<!-- ===== SUMMARY SCREEN ===== -->
-<div id="summary-screen" class="screen">
-    <div class="summary-wrap">
-        <h1 class="summary-heading">Your Ethical Profile</h1>
-        <div class="summary-choices-list" id="summary-choices-list"></div>
-        <div class="summary-bars" id="summary-bars"></div>
-        <div class="summary-reflection">
-            <h3>Why This Matters</h3>
-            <p>Every choice reflects a real engineering decision. As humanoid robots enter homes — a market projected to reach <strong>$38 billion by 2035</strong> — these tradeoffs will affect millions of families.</p>
-            <div class="stat-row">
-                <div class="stat"><span>10-100×</span>Higher false-positive rates for Black faces in facial recognition (NIST 2019)</div>
-                <div class="stat"><span>75%</span>of Americans concerned about data overcollection (Pew 2023)</div>
-                <div class="stat"><span>95%</span>daily engagement rate with companion robots (ElliQ 2022)</div>
+            <div class="status-strip">
+                <div class="pill" id="week-pill">Week 1 / 8</div>
+                <div class="pill" id="event-pill">Waiting for policy run</div>
+                <div class="pill accent" id="ending-hint">System stable</div>
             </div>
-        </div>
-        <button class="btn-play" onclick="restartGame()" style="margin-top:30px;"><span class="play-icon">↻</span> PLAY AGAIN</button>
-    </div>
-</div>
+        </header>
 
-<script src="characters.js"></script>
-<script src="script.js"></script>
+        <main class="sim-layout">
+            <section class="panel controls-panel">
+                <div class="panel-head">
+                    <h3>Household Policies</h3>
+                    <p>Adjust ARIA before running the next week.</p>
+                </div>
+                <div id="controls" class="controls"></div>
+                <button class="primary-button full-width" id="run-button" type="button">Run Week</button>
+            </section>
+
+            <section class="panel stage-panel">
+                <div class="stage-head">
+                    <div>
+                        <p class="eyebrow">CURRENT ENVIRONMENT</p>
+                        <h3 id="stage-title">Kitchen Tension</h3>
+                    </div>
+                    <div class="stage-tags">
+                        <span class="mini-pill" id="scene-room">Kitchen</span>
+                        <span class="mini-pill" id="scene-time">Morning</span>
+                    </div>
+                </div>
+                <div class="scene-shell">
+                    <div class="room-bg" id="room-bg"></div>
+                    <div class="room-furniture" id="room-furniture"></div>
+                    <div class="room-characters" id="room-characters"></div>
+                    <div class="room-overlay">
+                        <div class="scene-note" id="scene-note"></div>
+                    </div>
+                </div>
+                <div class="weekly-summary">
+                    <div class="event-card">
+                        <p class="eyebrow">LATEST SYSTEM READ</p>
+                        <h4 id="feedback-title">Before the first run</h4>
+                        <p id="feedback-copy">Tune the sliders, then run the week to see which pressure point surfaces inside the household.</p>
+                    </div>
+                    <div class="trend-card">
+                        <p class="eyebrow">THIS WEEK'S PRESSURES</p>
+                        <div id="metrics" class="metrics"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel status-panel">
+                <div class="panel-head">
+                    <h3>Persistent Family State</h3>
+                    <p>These values carry across all eight weeks.</p>
+                </div>
+                <div id="state-bars" class="state-bars"></div>
+                <div class="log-panel">
+                    <div class="panel-head compact">
+                        <h3>Family Log</h3>
+                        <p>Most recent week first.</p>
+                    </div>
+                    <div id="history-list" class="history-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="event-modal" class="modal">
+        <div class="modal-card">
+            <div class="modal-icon" id="event-icon">!</div>
+            <p class="eyebrow" id="event-kicker">WEEKLY DILEMMA</p>
+            <h3 id="event-title">Event title</h3>
+            <p class="modal-copy" id="event-desc"></p>
+            <div class="trigger-box" id="trigger-box"></div>
+            <div class="choice-list" id="choice-list"></div>
+        </div>
+    </div>
+
+    <div id="consequence-modal" class="modal">
+        <div class="modal-card consequence-card">
+            <p class="eyebrow">CONSEQUENCE</p>
+            <h3 id="consequence-title">Choice recorded</h3>
+            <p class="modal-copy" id="consequence-copy"></p>
+            <div class="delta-list" id="delta-list"></div>
+            <div class="ethics-box">
+                <strong>Ethical takeaway</strong>
+                <p id="ethics-copy"></p>
+            </div>
+            <button class="primary-button" id="continue-button" type="button">Continue</button>
+        </div>
+    </div>
+
+    <div id="summary-screen" class="screen">
+        <div class="summary-panel">
+            <p class="eyebrow">FINAL REPORT</p>
+            <h1 id="ending-title">Ending</h1>
+            <p class="summary-copy" id="ending-copy"></p>
+            <div class="summary-grid">
+                <section class="summary-card">
+                    <h3>Final State</h3>
+                    <div id="final-states" class="final-states"></div>
+                </section>
+                <section class="summary-card">
+                    <h3>Policy Pattern</h3>
+                    <p id="policy-summary" class="summary-copy"></p>
+                </section>
+                <section class="summary-card span-2">
+                    <h3>Weekly Timeline</h3>
+                    <div id="timeline" class="timeline"></div>
+                </section>
+            </div>
+            <button class="primary-button" id="restart-button" type="button">Restart</button>
+        </div>
+    </div>
+
+    <script src="characters.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
