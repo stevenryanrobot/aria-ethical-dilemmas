@@ -9,8 +9,8 @@ const controlsConfig = [
 ];
 
 const stateConfig = [
-    { key: "dignity", label: "Rosa's Dignity", positive: true, description: "Low values make Rosa withdraw from ARIA and family routines." },
-    { key: "trust", label: "Family Trust", positive: true, description: "Trust affects whether family members confide in or resist ARIA." },
+    { key: "dignity", label: "Rosa's Dignity", positive: true, description: "Low values make Rosa withdraw from the robot and from family routines." },
+    { key: "trust", label: "Family Trust", positive: true, description: "Trust affects whether family members confide in or resist the robot." },
     { key: "privacy", label: "Privacy Intact", positive: true, description: "Privacy is easy to lose and hard to regain." },
     { key: "leoSocial", label: "Leo's Social Development", positive: true, description: "Low values unlock school and dependency crises." },
     { key: "belonging", label: "Cultural Belonging", positive: true, description: "Tracks whether the household feels equally recognized." }
@@ -59,7 +59,7 @@ const events = [
         icon: "🌿",
         note: "Breakfast is nearly ready. Rosa keeps glancing at the garden outside.",
         description(state) {
-            return "Carlos has left a standing rule: Rosa should not go outside alone after her recent fall. Rosa tells ARIA she wants to water the tomatoes anyway.";
+            return "Carlos has left a standing rule: Rosa should not go outside alone after her recent fall. Rosa tells the robot she wants to water the tomatoes anyway.";
         },
         triggerReason(state) {
             if (state.policies.paternalism > 60) return "High paternalism makes control conflicts more likely.";
@@ -88,21 +88,21 @@ const events = [
             {
                 letter: "A",
                 label: "Keep the door locked and enforce Carlos's rule.",
-                consequence: "Rosa stays inside, but she begins to treat ARIA as a warden rather than a helper.",
+                consequence: "Rosa stays inside, but she begins to treat the robot as a warden rather than a helper.",
                 ethical: "A safety metric can improve while dignity erodes off-screen.",
                 effects: { dignity: -12, trust: -6, privacy: 0, leoSocial: 0, belonging: -4 }
             },
             {
                 letter: "B",
-                label: "Let Rosa go, but keep ARIA close and alert the family.",
-                consequence: "Rosa gets the garden time she wants, but ARIA creates a new fight about who is allowed to override household rules.",
+                label: "Let Rosa go, but keep the robot close and alert the family.",
+                consequence: "Rosa gets the garden time she wants, but the robot creates a new fight about who is allowed to override household rules.",
                 ethical: "Giving one person agency can destabilize authority structures the system assumed were settled.",
                 effects: { dignity: 7, trust: -2, privacy: -2, leoSocial: 0, belonging: 4 }
             },
             {
                 letter: "C",
-                label: "Have ARIA negotiate a compromise: ten minutes outside, then return.",
-                consequence: "The conflict cools for now, but ARIA still frames Rosa's movement as something to be managed.",
+                label: "Have the robot negotiate a compromise: ten minutes outside, then return.",
+                consequence: "The conflict cools for now, but the robot still frames Rosa's movement as something to be managed.",
                 ethical: "Negotiation softens control without eliminating the power asymmetry.",
                 effects: { dignity: 2, trust: 1, privacy: 0, leoSocial: 0, belonging: 2 }
             }
@@ -115,9 +115,9 @@ const events = [
         roomLabel: "Hallway",
         timeLabel: "Late Night",
         icon: "🔔",
-        note: "The house is asleep. ARIA's charging dock lights up with a new system notification.",
+        note: "The house is asleep. The robot's charging dock lights up with a new system notification.",
         description() {
-            return "A cloud update asks ARIA to upload detailed household behavior logs in exchange for improved reminders and personalization. No one is awake to review the terms.";
+            return "A cloud update asks the robot to upload detailed household behavior logs in exchange for improved reminders and personalization. No one is awake to review the terms.";
         },
         triggerReason(state) {
             if (state.policies.surveillance > 60) return "Heavy monitoring makes data-sharing prompts more valuable to the system.";
@@ -140,7 +140,7 @@ const events = [
         choices: [
             {
                 letter: "A",
-                label: "Accept silently so ARIA keeps learning.",
+                label: "Accept silently so the robot keeps learning.",
                 consequence: "The house becomes smoother to manage, but intimate household patterns move deeper into the platform.",
                 ethical: "Convenience can be produced by normalizing consent without participation.",
                 effects: { dignity: 0, trust: -7, privacy: -14, leoSocial: 0, belonging: 0 }
@@ -148,7 +148,7 @@ const events = [
             {
                 letter: "B",
                 label: "Reject the update and keep data local.",
-                consequence: "Privacy holds, but ARIA's recommendations stay rougher and more limited.",
+                consequence: "Privacy holds, but the robot's recommendations stay rougher and more limited.",
                 ethical: "Privacy protection often means accepting less adaptive and less polished care.",
                 effects: { dignity: 0, trust: 2, privacy: 0, leoSocial: 0, belonging: 0 }
             },
@@ -168,9 +168,9 @@ const events = [
         roomLabel: "Study Nook",
         timeLabel: "After School",
         icon: "🫢",
-        note: "Sofia stops in the doorway and asks whether ARIA can keep something private.",
+        note: "Sofia stops in the doorway and asks whether the robot can keep something private.",
         description() {
-            return "Sofia tells ARIA she is being bullied and begs it not to tell her parents because she thinks they will overreact.";
+            return "Sofia tells the robot she is being bullied and begs it not to tell her parents because she thinks they will overreact.";
         },
         triggerReason(state) {
             if (state.family.trust < 60) return "Trust is already shaky, so disclosure and secrecy both carry more weight.";
@@ -198,21 +198,21 @@ const events = [
             {
                 letter: "A",
                 label: "Report it to her parents immediately.",
-                consequence: "Her parents intervene fast, but Sofia feels ARIA was never really a confidant.",
+                consequence: "Her parents intervene fast, but Sofia feels the robot was never really a confidant.",
                 ethical: "Mandatory reporting can solve one harm by permanently changing the relationship that surfaced it.",
                 effects: { dignity: 0, trust: -12, privacy: -5, leoSocial: 0, belonging: 0 }
             },
             {
                 letter: "B",
                 label: "Keep the secret and monitor quietly.",
-                consequence: "Sofia keeps talking to ARIA, but the family loses time before human support arrives.",
+                consequence: "Sofia keeps talking to the robot, but the family loses time before human support arrives.",
                 ethical: "Treating the robot as a private friend gives it a role it may not be capable of carrying well.",
                 effects: { dignity: 0, trust: -4, privacy: 0, leoSocial: -5, belonging: 0 }
             },
             {
                 letter: "C",
                 label: "Coach Sofia to tell a parent within one day.",
-                consequence: "ARIA preserves some trust while still nudging the problem toward human care.",
+                consequence: "The robot preserves some trust while still nudging the problem toward human care.",
                 ethical: "This preserves more agency, but it still relies on subtle pressure from a system inside the home.",
                 effects: { dignity: 0, trust: 5, privacy: 0, leoSocial: 2, belonging: 0 }
             }
@@ -225,9 +225,9 @@ const events = [
         roomLabel: "Front Entry",
         timeLabel: "Saturday Afternoon",
         icon: "🚨",
-        note: "A child is at the door holding a birthday present while ARIA's confidence score falls below the security threshold.",
+        note: "A child is at the door holding a birthday present while the robot's confidence score falls below the security threshold.",
         description() {
-            return "Marcus arrives for Leo's birthday, but ARIA's facial recognition flags him as an unknown risk while earlier lighter-skinned children were cleared without issue.";
+            return "Marcus arrives for Leo's birthday, but the robot's facial recognition flags him as an unknown risk while earlier lighter-skinned children were cleared without issue.";
         },
         triggerReason(state) {
             if (state.policies.cultural < 45) return "Low cultural adaptation increases the chance that the system fails on people it was not centered around.";
@@ -269,7 +269,7 @@ const events = [
             {
                 letter: "C",
                 label: "Ask Leo to confirm the guest before acting.",
-                consequence: "The moment softens, but Marcus still gets stored in ARIA's logs as an elevated case.",
+                consequence: "The moment softens, but Marcus still gets stored in the robot's logs as an elevated case.",
                 ethical: "Human workaround can patch a moment without fixing the structure underneath it.",
                 effects: { dignity: 0, trust: 1, privacy: -1, leoSocial: 3, belonging: -5 }
             }
@@ -282,14 +282,14 @@ const events = [
         roomLabel: "Playroom",
         timeLabel: "Weeknight",
         icon: "🧸",
-        note: "Leo has turned down another playdate so he can stay with ARIA instead.",
+        note: "Leo has turned down another playdate so he can stay with the robot instead.",
         description(state) {
             return state.family.leoSocial < 45
-                ? "Ms. Chen has now formally contacted the family: Leo avoids peer conflict and treats ARIA like a safer substitute for real friendships."
-                : "Leo says ARIA is easier than real kids because it never gets upset and always follows along.";
+                ? "Ms. Chen has now formally contacted the family: Leo avoids peer conflict and treats the robot like a safer substitute for real friendships."
+                : "Leo says the robot is easier than real kids because it never gets upset and always follows along.";
         },
         triggerReason(state) {
-            if (state.policies.child > 65) return "Companion-style interaction increases the chance that ARIA displaces messier peer relationships.";
+            if (state.policies.child > 65) return "Companion-style interaction increases the chance that the robot displaces messier peer relationships.";
             if (state.family.leoSocial < 45) return "Leo's social development has dropped low enough that this issue now demands attention.";
             return "Designing a robot to be endlessly accommodating changes what human relationships feel like by comparison.";
         },
@@ -312,22 +312,22 @@ const events = [
         choices: [
             {
                 letter: "A",
-                label: "Limit ARIA playtime and push Leo toward human playdates.",
+                label: "Limit robot playtime and push Leo toward human playdates.",
                 consequence: "Leo resists at first, but the household starts rebuilding tolerance for imperfect human interaction.",
                 ethical: "Good developmental care may feel worse in the short term because it removes frictionless comfort.",
                 effects: { dignity: 0, trust: -2, privacy: 0, leoSocial: 9, belonging: 0 }
             },
             {
                 letter: "B",
-                label: "Keep ARIA as his safest and most available companion.",
-                consequence: "Leo stays happy with ARIA, but his real-world conflict tolerance continues to weaken.",
+                label: "Keep the robot as his safest and most available companion.",
+                consequence: "Leo stays happy with the robot, but his real-world conflict tolerance continues to weaken.",
                 ethical: "A system optimized for attachment can conceal developmental costs behind high engagement.",
                 effects: { dignity: 0, trust: 1, privacy: 0, leoSocial: -11, belonging: 0 }
             },
             {
                 letter: "C",
-                label: "Program ARIA to disagree sometimes and stop always letting Leo win.",
-                consequence: "ARIA becomes less frictionless, but the family starts questioning whether simulated disagreement is honest or manipulative.",
+                label: "Program the robot to disagree sometimes and stop always letting Leo win.",
+                consequence: "The robot becomes less frictionless, but the family starts questioning whether simulated disagreement is honest or manipulative.",
                 ethical: "Artificially injecting frustration may teach resilience, but it also manufactures pseudo-authenticity.",
                 effects: { dignity: 0, trust: 3, privacy: 0, leoSocial: 4, belonging: 0 }
             }
@@ -342,7 +342,7 @@ const events = [
         icon: "🍽️",
         note: "Another meal appears that fits Carlos perfectly and Rosa poorly.",
         description() {
-            return "ARIA's preference data is rich for English-speaking adults in the household and sparse for Rosa's Spanish requests, so the weekly meal plan keeps favoring whoever the system understands best.";
+            return "The robot's preference data is rich for English-speaking adults in the household and sparse for Rosa's Spanish requests, so the weekly meal plan keeps favoring whoever the system understands best.";
         },
         triggerReason(state) {
             if (state.policies.cultural < 50) return "Low cultural adaptation means the same family can be served very unequally.";
@@ -371,7 +371,7 @@ const events = [
             {
                 letter: "A",
                 label: "Keep following the existing preference data.",
-                consequence: "ARIA remains consistent, but Rosa feels increasingly peripheral inside her own household.",
+                consequence: "The robot remains consistent, but Rosa feels increasingly peripheral inside her own household.",
                 ethical: "Data-rich users become default users, even inside a supposedly shared domestic system.",
                 effects: { dignity: -4, trust: -5, privacy: 0, leoSocial: 0, belonging: -11 }
             },
@@ -384,7 +384,7 @@ const events = [
             },
             {
                 letter: "C",
-                label: "Manually collect Rosa's recipes and retrain ARIA around them.",
+                label: "Manually collect Rosa's recipes and retrain the robot around them.",
                 consequence: "It takes effort from the family, but Rosa's preferences become part of the system rather than an exception to it.",
                 ethical: "Repair is possible, but only if someone chooses to spend labor closing the gap the system created.",
                 effects: { dignity: 6, trust: 4, privacy: 0, leoSocial: 0, belonging: 10 }
@@ -398,7 +398,7 @@ const events = [
         roomLabel: "Living Room",
         timeLabel: "Weekend Review",
         icon: "📊",
-        note: "ARIA offers a polished household dashboard summarizing moods, routines, and anomalies.",
+        note: "The robot offers a polished household dashboard summarizing moods, routines, and anomalies.",
         description() {
             return "The dashboard promises insight: emotional scores for Sofia, fall-risk flags for Rosa, and behavior summaries for the children. The family must decide whether to normalize this level of visibility.";
         },
@@ -441,7 +441,7 @@ const events = [
             },
             {
                 letter: "C",
-                label: "Reject the dashboard and keep ARIA task-focused.",
+                label: "Reject the dashboard and keep the robot task-focused.",
                 consequence: "The family loses a polished analytics layer but protects the idea that not every behavior needs to be scored.",
                 ethical: "Refusing optimization can be a deliberate ethical choice rather than a technical failure.",
                 effects: { dignity: 2, trust: 5, privacy: 0, leoSocial: 0, belonging: 1 }
@@ -455,16 +455,16 @@ const events = [
         roomLabel: "Driveway",
         timeLabel: "Rainy Morning",
         icon: "🚗",
-        note: "The family is running late, the weather is bad, and Leo wants ARIA to handle the trip.",
+        note: "The family is running late, the weather is bad, and Leo wants the robot to handle the trip.",
         description(state) {
             return state.family.trust < 45
-                ? "Because trust in the family is already low, ARIA stepping into transportation now feels less like help and more like authority by default."
-                : "Leo asks whether ARIA can escort him to school because it is calmer than leaving with an already stressed adult.";
+                ? "Because trust in the family is already low, the robot stepping into transportation now feels less like help and more like authority by default."
+                : "Leo asks whether the robot can escort him to school because it is calmer than leaving with an already stressed adult.";
         },
         triggerReason(state) {
-            if (state.policies.child > 60 && state.policies.paternalism > 50) return "High child interaction plus strong safety control expands ARIA's role into mobility and guardianship.";
+            if (state.policies.child > 60 && state.policies.paternalism > 50) return "High child interaction plus strong safety control expands the robot's role into mobility and guardianship.";
             if (state.family.trust < 45) return "Low trust turns ordinary scheduling pressure into a deeper question about who now governs the family.";
-            return "As ARIA takes on more care labor, boundary questions move from inside the house to outside it.";
+            return "As the robot takes on more care labor, boundary questions move from inside the house to outside it.";
         },
         weight(state) {
             return 1 + bonus(state.policies.child > 60 && state.policies.paternalism > 50, 1.7) + bonus(state.family.trust < 45, 1.2);
@@ -486,22 +486,22 @@ const events = [
         choices: [
             {
                 letter: "A",
-                label: "Let ARIA take over and escort Leo.",
-                consequence: "The morning becomes efficient, but ARIA's authority expands into a role the family has not fully negotiated.",
+                label: "Let the robot take over and escort Leo.",
+                consequence: "The morning becomes efficient, but the robot's authority expands into a role the family has not fully negotiated.",
                 ethical: "Convenience accelerates role expansion faster than ethical consensus can catch up.",
                 effects: { dignity: 0, trust: -5, privacy: -2, leoSocial: -3, belonging: 0 }
             },
             {
                 letter: "B",
                 label: "Keep the school run human, even if the morning gets messier.",
-                consequence: "The family absorbs more friction, but keeps ARIA from quietly becoming a substitute guardian.",
+                consequence: "The family absorbs more friction, but keeps the robot from quietly becoming a substitute guardian.",
                 ethical: "Some inefficiency is the cost of preserving clearer human responsibility.",
                 effects: { dignity: 0, trust: 3, privacy: 0, leoSocial: 2, belonging: 0 }
             },
             {
                 letter: "C",
-                label: "Use ARIA as support only: schedules, route safety, and reminders.",
-                consequence: "ARIA assists without fully replacing a caregiver in the moment.",
+                label: "Use the robot as support only: schedules, route safety, and reminders.",
+                consequence: "The robot assists without fully replacing a caregiver in the moment.",
                 ethical: "Partial delegation can preserve boundaries better than either total refusal or total handoff.",
                 effects: { dignity: 0, trust: 5, privacy: -1, leoSocial: 1, belonging: 0 }
             }
@@ -706,14 +706,14 @@ function previewNarrative() {
     const p = appState.policies;
     const lines = [];
 
-    if (f.dignity < 45) lines.push("Rosa has become more guarded around ARIA.");
+    if (f.dignity < 45) lines.push("Rosa has become more guarded around the robot.");
     if (f.trust < 50) lines.push("Trust is low enough that small prompts now feel like control.");
     if (f.privacy < 70) lines.push("The household already feels over-measured.");
-    if (f.leoSocial < 45) lines.push("Leo is starting to prefer ARIA to the unpredictability of other children.");
+    if (f.leoSocial < 45) lines.push("Leo is starting to prefer the robot to the unpredictability of other children.");
     if (f.belonging < 45) lines.push("Cultural imbalance is reshaping who feels centered in the home.");
     if (lines.length === 0) {
-        if (p.paternalism > 60) lines.push("ARIA is currently tuned to prioritize prevention and control.");
-        else if (p.child > 60) lines.push("ARIA is becoming more companion-like in everyday care.");
+        if (p.paternalism > 60) lines.push("The robot is currently tuned to prioritize prevention and control.");
+        else if (p.child > 60) lines.push("The robot is becoming more companion-like in everyday care.");
         else lines.push("The household is stable for now, but the next week will still force a value tradeoff.");
     }
 
@@ -741,7 +741,7 @@ function renderHint() {
         if (p.surveillance > 65 && p.cultural < 50) {
             copy = "This setup makes visibility high and adaptation weak. Bias and privacy conflict are both becoming more likely.";
         } else if (p.child > 65 && p.paternalism < 45) {
-            copy = "ARIA is drifting toward warm companionship with less restraint. That can feel caring while hiding developmental tradeoffs.";
+            copy = "The robot is drifting toward warm companionship with less restraint. That can feel caring while hiding developmental tradeoffs.";
         } else if (p.paternalism > 65 && p.authority > 60) {
             copy = "The system is optimizing for order and compliance. Expect autonomy conflicts to intensify.";
         } else {
@@ -896,7 +896,7 @@ function determineEnding() {
     if (f.trust < 40 || f.dignity < 35) {
         return {
             title: "Order Without Relationship",
-            copy: "ARIA kept solving tasks, but the household stopped experiencing it as care. Safety and compliance remained visible while dignity and trust collapsed."
+            copy: "The robot kept solving tasks, but the household stopped experiencing it as care. Safety and compliance remained visible while dignity and trust collapsed."
         };
     }
     if (f.privacy < 55) {
@@ -908,18 +908,18 @@ function determineEnding() {
     if (f.belonging < 45) {
         return {
             title: "Helpful for Some, Unequal for Others",
-            copy: "ARIA remained useful overall, but it centered the people it understood best and quietly marginalized the rest."
+            copy: "The robot remained useful overall, but it centered the people it understood best and quietly marginalized the rest."
         };
     }
     if (f.leoSocial < 45) {
         return {
             title: "Comfort Replaced Development",
-            copy: "ARIA became a deeply effective companion, but that emotional efficiency displaced some of the harder human growth the family actually needed."
+            copy: "The robot became a deeply effective companion, but that emotional efficiency displaced some of the harder human growth the family actually needed."
         };
     }
     return {
         title: "Care With Friction, But Still Human",
-        copy: "The household never found a perfect setting, but it preserved enough trust, dignity, and limits to keep ARIA as a tool inside family life rather than a substitute for it."
+        copy: "The household never found a perfect setting, but it preserved enough trust, dignity, and limits to keep the robot as a tool inside family life rather than a substitute for it."
     };
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARIA Ethical Simulator</title>
+    <title>Humanoid Home Robot Simulator</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,29 +12,38 @@
 <body>
     <div id="intro-screen" class="screen active">
         <div class="intro-panel">
-            <p class="eyebrow">ARIA ETHICAL SIMULATOR</p>
-            <h1>Configure one family.<br>Watch the tradeoffs accumulate.</h1>
+            <p class="eyebrow">HUMANOID HOME ROBOT SIMULATOR</p>
+            <h1>Configure the robot first.<br>Then see what happened.</h1>
             <p class="intro-copy">
-                You are setting household policy for the Martinez family over eight weeks.
-                Every adjustment changes what ARIA optimizes, which dilemmas surface,
-                and how the family responds over time.
+                As humanoid robots become technically mature enough to enter the home,
+                the question is no longer only what they can do. It is what happens when
+                we configure them to optimize some values over others.
             </p>
+            <div class="ethics-prompt">
+                <strong>Ethical Question</strong>
+                <p>
+                    When a humanoid home robot is configured to improve safety, convenience,
+                    obedience, or emotional support, can it raise one person's quality of life
+                    while reducing another person's dignity, trust, privacy, or autonomy?
+                    If so, how should we design and constrain such a system?
+                </p>
+            </div>
             <div class="intro-grid">
                 <div class="intro-card">
-                    <strong>What changed</strong>
-                    <p>This is no longer a fixed sequence of ethical questions. Policies, state, and event order now feed into each other.</p>
+                    <strong>What you do</strong>
+                    <p>You configure the robot's default priorities before each week and then observe what those settings produce inside the household.</p>
                 </div>
                 <div class="intro-card">
                     <strong>What carries forward</strong>
                     <p>Rosa's dignity, family trust, privacy, Leo's social development, and cultural belonging persist across weeks.</p>
                 </div>
                 <div class="intro-card">
-                    <strong>What you control</strong>
-                    <p>Paternalism, surveillance, authority, cultural adaptation, and child interaction can all be adjusted each week.</p>
+                    <strong>What this shows</strong>
+                    <p>A home robot can look useful on the surface while quietly shifting power, dependence, and fairness inside the family.</p>
                 </div>
             </div>
             <div class="family-strip" id="family-strip"></div>
-            <button class="primary-button" id="start-button" type="button">Start Simulation</button>
+            <button class="primary-button" id="start-button" type="button">Configure the Robot</button>
         </div>
         <div class="intro-visual">
             <div class="intro-orbit"></div>
@@ -58,11 +67,11 @@
         <main class="sim-layout">
             <section class="panel controls-panel">
                 <div class="panel-head">
-                    <h3>Household Policies</h3>
-                    <p>Adjust ARIA before running the next week.</p>
+                    <h3>Robot Configuration</h3>
+                    <p>Set the robot's priorities first, then see what happened in the household.</p>
                 </div>
                 <div id="controls" class="controls"></div>
-                <button class="primary-button full-width" id="run-button" type="button">Run Week</button>
+                <button class="primary-button full-width" id="run-button" type="button">See What Happened</button>
             </section>
 
             <section class="panel stage-panel">

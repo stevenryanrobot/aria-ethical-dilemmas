@@ -164,6 +164,26 @@ button {
     line-height: 1.65;
 }
 
+.ethics-prompt {
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(14, 122, 109, 0.08), rgba(184, 134, 11, 0.08));
+    border: 1px solid rgba(14, 122, 109, 0.2);
+}
+
+.ethics-prompt strong {
+    display: block;
+    margin-bottom: 8px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 18px;
+}
+
+.ethics-prompt p {
+    margin: 0;
+    color: var(--ink);
+    line-height: 1.7;
+}
+
 .intro-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
