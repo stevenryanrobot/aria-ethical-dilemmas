@@ -1,5 +1,5 @@
 // =============================================
-// ARIA — Character SVG Generators
+// Robot — Character SVG Generators
 // Atlas-style humanoid robot + Cartoon people
 // =============================================
 

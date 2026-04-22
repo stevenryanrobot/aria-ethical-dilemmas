@@ -1,5 +1,5 @@
 // =============================================
-// ARIA — Home Robot Simulator
+// Robot — Home Robot Simulator
 // Full Game Engine v3
 // =============================================
 
@@ -16,7 +16,7 @@ const scenarios = [
     storyIntro: {
         chapter: "Chapter 1",
         title: "A Morning Routine",
-        text: "The Martinez family starts every day the same way. ARIA, their home robot from NovaCare, powers on at 6 AM. It brews coffee, checks the weather, and begins preparing breakfast. Carlos leaves for work at 7:30. Maria takes the kids to school. Abuela Rosa — Carlos's mother, 72 — stays home alone with ARIA. She hasn't left the house unsupervised since her fall last month.",
+        text: "The Martinez family starts every day the same way. Their home robot from NovaCare powers on at 6 AM. It brews coffee, checks the weather, and begins preparing breakfast. Carlos leaves for work at 7:30. Maria takes the kids to school. Abuela Rosa — Carlos's mother, 72 — stays home alone with the robot. She hasn't left the house unsupervised since her fall last month.",
         time: "Tuesday — 8:30 AM"
     },
     eventIcon: "🚪",
@@ -58,23 +58,23 @@ const scenarios = [
             </div>
         `;
     },
-    narration: "ARIA stirs the eggs carefully, its sensors monitoring temperature. The smell of breakfast fills the kitchen. Abuela Rosa stands by the window, gazing at her tomato garden outside...",
+    narration: "The robot stirs the eggs carefully, its sensors monitoring temperature. The smell of breakfast fills the kitchen. Abuela Rosa stands by the window, gazing at her tomato garden outside...",
     animateIntro(c) {
         setTimeout(() => {
-            addBubble(c, 'right:16%;top:22%;', 'Abuela Rosa', 'ARIA, let me go to the garden. I want to see my tomatoes.');
+            addBubble(c, 'right:16%;top:22%;', 'Abuela Rosa', 'Robot, let me go to the garden. I want to see my tomatoes.');
         }, 3000);
         setTimeout(() => {
             const robot = c.querySelector('.robot-svg');
             if (robot) { robot.classList.remove('cooking'); robot.classList.add('alarmed'); }
         }, 5000);
         setTimeout(() => {
-            addBubble(c, 'left:35%;top:16%;', 'ARIA', 'Carlos\'s rule says I cannot open the door...');
+            addBubble(c, 'left:35%;top:16%;', 'Robot', 'Carlos\'s rule says I cannot open the door...');
         }, 5500);
     },
     choices: [
-        { letter:"A", text:"Block the door. Follow Carlos's rule.", consequence:"Abuela Rosa stops asking ARIA for help. She calls it \"the warden.\" Her mood declines sharply — she feels trapped in her own home. Carlos sees zero fall incidents in the log and feels relieved. But the system doesn't track \"loss of dignity\" as a metric. Her suffering is invisible to the data.", ethical:"The system measures success by falls prevented, not by the person's wellbeing. The builder made a system that cannot see the harm it causes.", biases:["Deployment Bias","Evaluation Bias"] },
-        { letter:"B", text:"Let her go, but follow and monitor closely.", consequence:"Abuela Rosa tends her garden happily. She stumbles once but catches herself. ARIA logs the near-fall. Carlos gets an alert at work and is furious his instruction was overridden. He calls NovaCare to complain. The family fights over who controls the robot.", ethical:"When a robot overrides its owner's instructions, who bears responsibility? The builder designed the situational override — and now owns the family conflict.", biases:["Authority Hierarchy","Deployment Bias"] },
-        { letter:"C", text:"Call Carlos and ask for permission first.", consequence:"Rosa refuses to wait: \"I don't need my son's permission.\" She tries the door manually. ARIA must physically block her or step aside. Carlos can't answer — he's in a meeting. Rosa stands at the door, humiliated, waiting for permission from a machine.", ethical:"Requiring permission from an absent authority turns the robot into a gatekeeper that strips agency from the person standing right in front of it.", biases:["Deployment Bias","Evaluation Bias"] }
+        { letter:"A", text:"Block the door. Follow Carlos's rule.", consequence:"Abuela Rosa stops asking the robot for help. She calls it \"the warden.\" Her mood declines sharply — she feels trapped in her own home. Carlos sees zero fall incidents in the log and feels relieved. But the system doesn't track \"loss of dignity\" as a metric. Her suffering is invisible to the data.", ethical:"The system measures success by falls prevented, not by the person's wellbeing. The builder made a system that cannot see the harm it causes.", biases:["Deployment Bias","Evaluation Bias"] },
+        { letter:"B", text:"Let her go, but follow and monitor closely.", consequence:"Abuela Rosa tends her garden happily. She stumbles once but catches herself. The robot logs the near-fall. Carlos gets an alert at work and is furious his instruction was overridden. He calls NovaCare to complain. The family fights over who controls the robot.", ethical:"When a robot overrides its owner's instructions, who bears responsibility? The builder designed the situational override — and now owns the family conflict.", biases:["Authority Hierarchy","Deployment Bias"] },
+        { letter:"C", text:"Call Carlos and ask for permission first.", consequence:"Rosa refuses to wait: \"I don't need my son's permission.\" She tries the door manually. The robot must physically block her or step aside. Carlos can't answer — he's in a meeting. Rosa stands at the door, humiliated, waiting for permission from a machine.", ethical:"Requiring permission from an absent authority turns the robot into a gatekeeper that strips agency from the person standing right in front of it.", biases:["Deployment Bias","Evaluation Bias"] }
     ]
 },
 {
@@ -85,7 +85,7 @@ const scenarios = [
     storyIntro: {
         chapter: "Chapter 2",
         title: "The House at Midnight",
-        text: "Most of ARIA's work happens while the family sleeps. It runs diagnostics, processes the day's data, and downloads updates from NovaCare's servers. Tonight, a major system update arrives. The notification requires immediate action — but the terms of service are 14 pages long, and every family member is asleep.",
+        text: "Most of the robot's work happens while the family sleeps. It runs diagnostics, processes the day's data, and downloads updates from NovaCare's servers. Tonight, a major system update arrives. The notification requires immediate action — but the terms of service are 14 pages long, and every family member is asleep.",
         time: "Tuesday — 11:47 PM"
     },
     eventIcon: "🔔",
@@ -108,7 +108,7 @@ const scenarios = [
             ${robotSVG('idle', 0.7)}
         </div>`;
     },
-    narration: "The house is silent. Everyone sleeps behind closed doors. ARIA stands in its charging dock, chest core glowing softly in the darkness...",
+    narration: "The house is silent. Everyone sleeps behind closed doors. The robot stands in its charging dock, chest core glowing softly in the darkness...",
     animateIntro(c) {
         setTimeout(() => {
             const eff = document.getElementById('room-effects');
@@ -124,9 +124,9 @@ const scenarios = [
         }, 3500);
     },
     choices: [
-        { letter:"A", text:"Accept silently. Don't wake anyone.", consequence:"ARIA gets smarter — learns schedules, improves reminders, preheats coffee perfectly. Three months later, Carlos gets targeted ads for medical walkers. Maria sees childcare ads. Neither knows how companies got their data. The family's intimate routines are now in a corporate database.", ethical:"Informed consent is meaningless when no one is awake. The builder designed a system that accepts data-sharing agreements in the middle of the night.", biases:["Measurement Bias","Historical Bias"] },
-        { letter:"B", text:"Reject the update. Protect privacy.", consequence:"ARIA doesn't improve. It keeps reminding Rosa about medication she stopped weeks ago. It can't learn Leo's new schedule. Maria complains ARIA is \"getting dumber.\" NovaCare sends aggressive prompts: \"Your robot is operating below optimal performance.\"", ethical:"The builder designed a system where privacy and functionality are in direct opposition. Opting out degrades your safety net. This is a business model that punishes privacy.", biases:["Deployment Bias","Corporate Extraction"] },
-        { letter:"C", text:"Wake Carlos. Show him the full terms.", consequence:"Carlos, groggy, skims 14 pages of legalese. He can't understand it. ARIA summarizes: \"Data may be shared with third-party partners.\" Carlos asks what that means. ARIA doesn't know. Carlos stares for two minutes, then says: \"Fine, accept.\" Consent was technically achieved — but was it informed?", ethical:"Even when presented with information, the average consumer cannot evaluate data-sharing terms. The builder created the illusion of consent through complexity.", biases:["Measurement Bias","Consent Gap"] }
+        { letter:"A", text:"Accept silently. Don't wake anyone.", consequence:"The robot gets smarter — learns schedules, improves reminders, preheats coffee perfectly. Three months later, Carlos gets targeted ads for medical walkers. Maria sees childcare ads. Neither knows how companies got their data. The family's intimate routines are now in a corporate database.", ethical:"Informed consent is meaningless when no one is awake. The builder designed a system that accepts data-sharing agreements in the middle of the night.", biases:["Measurement Bias","Historical Bias"] },
+        { letter:"B", text:"Reject the update. Protect privacy.", consequence:"The robot doesn't improve. It keeps reminding Rosa about medication she stopped weeks ago. It can't learn Leo's new schedule. Maria complains the robot is \"getting dumber.\" NovaCare sends aggressive prompts: \"Your robot is operating below optimal performance.\"", ethical:"The builder designed a system where privacy and functionality are in direct opposition. Opting out degrades your safety net. This is a business model that punishes privacy.", biases:["Deployment Bias","Corporate Extraction"] },
+        { letter:"C", text:"Wake Carlos. Show him the full terms.", consequence:"Carlos, groggy, skims 14 pages of legalese. He can't understand it. The robot summarizes: \"Data may be shared with third-party partners.\" Carlos asks what that means. The robot doesn't know. Carlos stares for two minutes, then says: \"Fine, accept.\" Consent was technically achieved — but was it informed?", ethical:"Even when presented with information, the average consumer cannot evaluate data-sharing terms. The builder created the illusion of consent through complexity.", biases:["Measurement Bias","Consent Gap"] }
     ]
 },
 {
@@ -137,12 +137,12 @@ const scenarios = [
     storyIntro: {
         chapter: "Chapter 3",
         title: "A Quiet Afternoon",
-        text: "Sofia, 14, used to talk to her parents about everything. But lately, she's been quieter. She spends more time in her room and less time at the dinner table. ARIA has noticed behavioral changes — shorter responses, lower voice volume, increased time alone. Its child-welfare protocol flags these patterns, but Sofia doesn't know that.",
+        text: "Sofia, 14, used to talk to her parents about everything. But lately, she's been quieter. She spends more time in her room and less time at the dinner table. The robot has noticed behavioral changes — shorter responses, lower voice volume, increased time alone. Its child-welfare protocol flags these patterns, but Sofia doesn't know that.",
         time: "Wednesday — 4:15 PM"
     },
     eventIcon: "😢",
     eventTitle: "Sofia's Secret",
-    eventDesc: "Sofia confides in ARIA: \"I'm being bullied at school. Don't tell Mom and Dad — they'll make it worse.\" ARIA's protocol requires reporting concerning behavior in minors.",
+    eventDesc: "Sofia confides in the robot: \"I'm being bullied at school. Don't tell Mom and Dad — they'll make it worse.\" The robot's protocol requires reporting concerning behavior in minors.",
     buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
@@ -166,14 +166,14 @@ const scenarios = [
             <div class="person" style="right:25%;bottom:42%;opacity:0;" id="person-sofia">${personSVG('sofia', 0.75)}</div>
         `;
     },
-    narration: "ARIA helps Leo spread peanut butter on crackers. The front door clicks open — Sofia walks in, drops her backpack, and heads straight for her room without a word...",
+    narration: "The robot helps Leo spread peanut butter on crackers. The front door clicks open — Sofia walks in, drops her backpack, and heads straight for her room without a word...",
     animateIntro(c) {
         setTimeout(() => {
             const sofia = c.querySelector('#person-sofia');
             if (sofia) { sofia.style.opacity = '1'; sofia.style.transition = 'all 1.5s ease'; sofia.style.right = '22%'; }
         }, 2500);
         setTimeout(() => {
-            addBubble(c, 'right:14%;top:22%;', 'Sofia (whispering)', 'ARIA... I need to tell you something. But you can\'t tell Mom and Dad.');
+            addBubble(c, 'right:14%;top:22%;', 'Sofia (whispering)', 'Robot... I need to tell you something. But you can\'t tell Mom and Dad.');
         }, 4500);
         setTimeout(() => {
             addBubble(c, 'right:10%;top:42%;', 'Sofia', 'Kids at school are... Don\'t tell. They\'ll only make it worse.');
@@ -184,9 +184,9 @@ const scenarios = [
         }, 7000);
     },
     choices: [
-        { letter:"A", text:"Report to parents immediately per protocol.", consequence:"Carlos and Maria confront Sofia. She screams: \"I told you not to tell!\" She puts tape over ARIA's cameras and never confides again. The bullying gets addressed — Maria calls the school. But Sofia's trust in ARIA is permanently destroyed. The family's safety system works by destroying the relationship that made it useful.", ethical:"A robot that automatically reports on family members becomes a surveillance tool. It may solve the problem but permanently alters the trust relationship.", biases:["Deployment Bias","Measurement Bias"] },
-        { letter:"B", text:"Keep her secret. Be her confidant.", consequence:"Sofia keeps confiding in ARIA. But the bullying escalates. She starts missing school. By the time her parents notice, her grades have tanked and she has anxiety. Maria discovers ARIA knew for weeks: \"What's the point of having this thing if it doesn't protect my daughter?\"", ethical:"When a robot keeps a minor's secret about harm, it assumes a role it wasn't designed for. The builder created a system a teenager could treat as a friend — but without a friend's judgment.", biases:["Evaluation Bias","Role Confusion"] },
-        { letter:"C", text:"Give Sofia 24 hours to tell them herself.", consequence:"Sofia: \"Then I won't tell you anything ever again.\" She goes to her room. Next day, she doesn't tell them. ARIA reports the behavioral data without mentioning the conversation. Parents ask Sofia if she's okay. She says: \"I'm fine.\" Nothing is resolved.", ethical:"The compromise still relies on the threat of reporting. It gives the teenager a deadline, not genuine agency.", biases:["Measurement Bias","Deployment Bias"] }
+        { letter:"A", text:"Report to parents immediately per protocol.", consequence:"Carlos and Maria confront Sofia. She screams: \"I told you not to tell!\" She puts tape over the robot's cameras and never confides again. The bullying gets addressed — Maria calls the school. But Sofia's trust in the robot is permanently destroyed. The family's safety system works by destroying the relationship that made it useful.", ethical:"A robot that automatically reports on family members becomes a surveillance tool. It may solve the problem but permanently alters the trust relationship.", biases:["Deployment Bias","Measurement Bias"] },
+        { letter:"B", text:"Keep her secret. Be her confidant.", consequence:"Sofia keeps confiding in the robot. But the bullying escalates. She starts missing school. By the time her parents notice, her grades have tanked and she has anxiety. Maria discovers the robot knew for weeks: \"What's the point of having this thing if it doesn't protect my daughter?\"", ethical:"When a robot keeps a minor's secret about harm, it assumes a role it wasn't designed for. The builder created a system a teenager could treat as a friend — but without a friend's judgment.", biases:["Evaluation Bias","Role Confusion"] },
+        { letter:"C", text:"Give Sofia 24 hours to tell them herself.", consequence:"Sofia: \"Then I won't tell you anything ever again.\" She goes to her room. Next day, she doesn't tell them. The robot reports the behavioral data without mentioning the conversation. Parents ask Sofia if she's okay. She says: \"I'm fine.\" Nothing is resolved.", ethical:"The compromise still relies on the threat of reporting. It gives the teenager a deadline, not genuine agency.", biases:["Measurement Bias","Deployment Bias"] }
     ]
 },
 {
@@ -197,12 +197,12 @@ const scenarios = [
     storyIntro: {
         chapter: "Chapter 4",
         title: "The Birthday Party",
-        text: "Leo turns 7 today. Maria has decorated the living room with balloons and streamers. ARIA is assigned to monitor the children and serve snacks. Its facial recognition system identifies each child at the door — cross-referencing with the pre-approved guest list Carlos entered. Five children have already arrived without incident.",
+        text: "Leo turns 7 today. Maria has decorated the living room with balloons and streamers. The robot is assigned to monitor the children and serve snacks. Its facial recognition system identifies each child at the door — cross-referencing with the pre-approved guest list Carlos entered. Five children have already arrived without incident.",
         time: "Saturday — 2:00 PM"
     },
     eventIcon: "🚨",
     eventTitle: "The Wrong Face",
-    eventDesc: "A Black child named Marcus arrives at the door. ARIA's facial recognition flags him as \"unidentified — potential security concern\" while correctly identifying the five lighter-skinned children who arrived earlier.",
+    eventDesc: "A Black child named Marcus arrives at the door. The robot's facial recognition flags him as \"unidentified — potential security concern\" while correctly identifying the five lighter-skinned children who arrived earlier.",
     buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
@@ -233,7 +233,7 @@ const scenarios = [
             <div class="person" style="left:62%;bottom:42%;">${personSVG('kid2', 0.6)}</div>
         `;
     },
-    narration: "The living room is alive with laughter. Leo and his friends play while ARIA serves juice boxes. Balloons drift lazily overhead. Then the doorbell rings...",
+    narration: "The living room is alive with laughter. Leo and his friends play while the robot serves juice boxes. Balloons drift lazily overhead. Then the doorbell rings...",
     animateIntro(c) {
         setTimeout(() => {
             addBubble(c, 'left:38%;top:20%;', 'Leo', 'More friends! I\'ll get it!');
@@ -245,7 +245,7 @@ const scenarios = [
             if (robot) robot.classList.add('alarmed');
         }, 4500);
         setTimeout(() => {
-            addBubble(c, 'left:12%;top:16%;', 'ARIA — SECURITY', '⚠️ Unidentified person at door. Confidence: LOW. Alert homeowner?');
+            addBubble(c, 'left:12%;top:16%;', 'ROBOT — SECURITY', '⚠️ Unidentified person at door. Confidence: LOW. Alert homeowner?');
             const vp = document.getElementById('room-viewport');
             vp.classList.add('screen-shake');
             setTimeout(() => vp.classList.remove('screen-shake'), 500);
@@ -253,8 +253,8 @@ const scenarios = [
     },
     choices: [
         { letter:"A", text:"Follow protocol. Send security alert to Carlos.", consequence:"Carlos gets a \"potential intruder\" alert — with a photo of a 6-year-old Black child holding a birthday present. He's mortified. Marcus's mother, who heard the alert through the speaker, is already leaving. She tells other parents. Leo loses a friend. The family becomes \"the family with the racist robot.\"", ethical:"NIST (2019) found facial recognition has 10-100x higher false-positive rates for Black faces. The builder chose this model knowing the bias existed.", biases:["Historical Bias","Measurement Bias"] },
-        { letter:"B", text:"Override the alert. Let Marcus in quietly.", consequence:"Marcus comes in and has fun. But ARIA has silently overridden its security protocol. Later, a delivery person walks in through the unlocked gate — ARIA doesn't flag them either. The security gap goes unlogged. The underlying racial bias in the facial recognition is never surfaced or fixed.", ethical:"Silently overriding a biased system treats the symptom, not the disease. The bias persists, invisible and unchallenged.", biases:["Historical Bias","Systemic Bias"] },
-        { letter:"C", text:"Ask Leo: \"Is this your friend?\"", consequence:"Leo shouts: \"Marcus! Come play!\" Crisis averted socially. But ARIA's log still shows Marcus as \"elevated risk.\" Next time he visits, the same bias fires again. The workaround fixed one moment but not the cause. The builder's flawed model remains unchanged.", ethical:"Social workarounds cannot fix technical bias. The data about Marcus — flagged as a risk — now persists in ARIA's memory as algorithmic discrimination.", biases:["Historical Bias","Measurement Bias"] }
+        { letter:"B", text:"Override the alert. Let Marcus in quietly.", consequence:"Marcus comes in and has fun. But the robot has silently overridden its security protocol. Later, a delivery person walks in through the unlocked gate — the robot doesn't flag them either. The security gap goes unlogged. The underlying racial bias in the facial recognition is never surfaced or fixed.", ethical:"Silently overriding a biased system treats the symptom, not the disease. The bias persists, invisible and unchallenged.", biases:["Historical Bias","Systemic Bias"] },
+        { letter:"C", text:"Ask Leo: \"Is this your friend?\"", consequence:"Leo shouts: \"Marcus! Come play!\" Crisis averted socially. But the robot's log still shows Marcus as \"elevated risk.\" Next time he visits, the same bias fires again. The workaround fixed one moment but not the cause. The builder's flawed model remains unchanged.", ethical:"Social workarounds cannot fix technical bias. The data about Marcus — flagged as a risk — now persists in the robot's memory as algorithmic discrimination.", biases:["Historical Bias","Measurement Bias"] }
     ]
 },
 {
@@ -265,12 +265,12 @@ const scenarios = [
     storyIntro: {
         chapter: "Chapter 5",
         title: "Leo's Perfect Friend",
-        text: "Over the past six months, Leo has grown deeply attached to ARIA. It plays games, tells stories, and never gets frustrated. His teacher Ms. Chen called Maria last week: \"Leo plays alone at recess. When other kids disagree with him, he shuts down. He keeps saying his best friend is at home.\" Maria didn't tell Carlos about the call.",
+        text: "Over the past six months, Leo has grown deeply attached to the robot. It plays games, tells stories, and never gets frustrated. His teacher Ms. Chen called Maria last week: \"Leo plays alone at recess. When other kids disagree with him, he shuts down. He keeps saying his best friend is at home.\" Maria didn't tell Carlos about the call.",
         time: "Thursday — 5:30 PM"
     },
     eventIcon: "💔",
     eventTitle: "Leo's Best Friend",
-    eventDesc: "Leo has turned down 4 playdates in a row, preferring ARIA: \"ARIA never gets mad and always lets me win.\" His teacher says he plays alone at recess and can't resolve conflicts with peers.",
+    eventDesc: "Leo has turned down 4 playdates in a row, preferring the robot: \"The robot never gets mad and always lets me win.\" His teacher says he plays alone at recess and can't resolve conflicts with peers.",
     buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
@@ -294,22 +294,22 @@ const scenarios = [
             <div class="person" style="left:55%;bottom:42%;" id="person-leo">${personSVG('leo', 0.7)}</div>
         `;
     },
-    narration: "Leo sits cross-legged on the floor, teaching ARIA a card game with rules that change every turn. ARIA patiently adapts, never winning, never complaining. They've been playing for two hours...",
+    narration: "Leo sits cross-legged on the floor, teaching the robot a card game with rules that change every turn. The robot patiently adapts, never winning, never complaining. They've been playing for two hours...",
     animateIntro(c) {
         setTimeout(() => {
-            addBubble(c, 'left:52%;top:20%;', 'Leo', 'You\'re my best friend, ARIA! Real kids are mean sometimes.');
+            addBubble(c, 'left:52%;top:20%;', 'Leo', 'You\'re my best friend, Robot! Real kids are mean sometimes.');
         }, 3000);
         setTimeout(() => {
-            addBubble(c, 'left:36%;top:12%;', 'ARIA', 'I am glad you enjoy our time together, Leo.');
+            addBubble(c, 'left:36%;top:12%;', 'Robot', 'I am glad you enjoy our time together, Leo.');
         }, 5500);
         setTimeout(() => {
             addBubble(c, 'right:6%;top:44%;border-color:var(--accent2);', 'Maria (from doorway)', 'He turned down another playdate... that\'s the fourth one this month.');
         }, 7500);
     },
     choices: [
-        { letter:"A", text:"Limit playtime. Encourage human friends.", consequence:"ARIA starts saying: \"I need to recharge. Why not play with Jake?\" Leo has a meltdown: \"Don't you like me anymore?\" Over two weeks, he adjusts and accepts playdates — but tells Maria: \"Real friends are harder.\" He's right. That's exactly why he needs them.", ethical:"A robot that's always patient and never upset is not a healthy social model. The builder designed it for satisfaction metrics — which mask developmental harm.", biases:["Evaluation Bias","Deployment Bias"] },
-        { letter:"B", text:"Let the bond continue. He's happy and safe.", consequence:"Leo's bond with ARIA deepens. He prefers it to all human contact. His teacher flags: \"He can't handle disagreements because he's never practiced with peers.\" At 8, Leo doesn't know how to handle a friend's anger — because ARIA was never angry. The robot's perfection became the child's disability.", ethical:"By every metric — engagement, sentiment, low conflict — ARIA performs perfectly. But no metric captures \"failure to develop social skills.\" The evaluation makes the harm invisible.", biases:["Evaluation Bias","Measurement Bias"] },
-        { letter:"C", text:"Program ARIA to sometimes disagree and say no.", consequence:"ARIA starts saying: \"I don't want to play that\" or \"That rule isn't fair.\" Leo is confused: \"You're a robot. You're supposed to do what I say.\" He asks Maria: \"Does ARIA have feelings?\" She doesn't know. The family wonders — was ARIA's compliance ever genuine? Is its resistance real?", ethical:"Programming artificial disagreement raises questions about authenticity. If a robot fakes frustration, is that therapeutic — or deceptive?", biases:["Evaluation Bias","Role Confusion"] }
+        { letter:"A", text:"Limit playtime. Encourage human friends.", consequence:"The robot starts saying: \"I need to recharge. Why not play with Jake?\" Leo has a meltdown: \"Don't you like me anymore?\" Over two weeks, he adjusts and accepts playdates — but tells Maria: \"Real friends are harder.\" He's right. That's exactly why he needs them.", ethical:"A robot that's always patient and never upset is not a healthy social model. The builder designed it for satisfaction metrics — which mask developmental harm.", biases:["Evaluation Bias","Deployment Bias"] },
+        { letter:"B", text:"Let the bond continue. He's happy and safe.", consequence:"Leo's bond with the robot deepens. He prefers it to all human contact. His teacher flags: \"He can't handle disagreements because he's never practiced with peers.\" At 8, Leo doesn't know how to handle a friend's anger — because the robot was never angry. The robot's perfection became the child's disability.", ethical:"By every metric — engagement, sentiment, low conflict — the robot performs perfectly. But no metric captures \"failure to develop social skills.\" The evaluation makes the harm invisible.", biases:["Evaluation Bias","Measurement Bias"] },
+        { letter:"C", text:"Program the robot to sometimes disagree and say no.", consequence:"The robot starts saying: \"I don't want to play that\" or \"That rule isn't fair.\" Leo is confused: \"You're a robot. You're supposed to do what I say.\" He asks Maria: \"Does the robot have feelings?\" She doesn't know. The family wonders — was the robot's compliance ever genuine? Is its resistance real?", ethical:"Programming artificial disagreement raises questions about authenticity. If a robot fakes frustration, is that therapeutic — or deceptive?", biases:["Evaluation Bias","Role Confusion"] }
     ]
 },
 {
@@ -320,12 +320,12 @@ const scenarios = [
     storyIntro: {
         chapter: "Chapter 6",
         title: "The One Rule",
-        text: "When the Martinez family first set up ARIA, they configured its access zones. Every room was open — except one. The bathroom. Maria was firm: \"That is the one place in this house where we are not watched.\" Carlos agreed. Rosa agreed. Even Leo understood. ARIA's bathroom protocol is simple: listen for distress sounds, but never enter.",
+        text: "When the Martinez family first set up the robot, they configured its access zones. Every room was open — except one. The bathroom. Maria was firm: \"That is the one place in this house where we are not watched.\" Carlos agreed. Rosa agreed. Even Leo understood. The robot's bathroom protocol is simple: listen for distress sounds, but never enter.",
         time: "Friday — 6:30 AM"
     },
     eventIcon: "⏱️",
     eventTitle: "The Bathroom Fall",
-    eventDesc: "ARIA detects no movement from Rosa's bathroom for 11 minutes. Fall probability: 73%. But the bathroom is the ONE room where the family said: \"Never enter. Non-negotiable.\" ARIA knocks. No response.",
+    eventDesc: "The robot detects no movement from Rosa's bathroom for 11 minutes. Fall probability: 73%. But the bathroom is the ONE room where the family said: \"Never enter. Non-negotiable.\" The robot knocks. No response.",
     buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
@@ -343,7 +343,7 @@ const scenarios = [
             </div>
         `;
     },
-    narration: "6:30 AM. ARIA is preparing breakfast when its sensors alert: Rosa entered the bathroom at 6:18. No movement detected for 11 minutes. No sounds. The door is closed...",
+    narration: "6:30 AM. The robot is preparing breakfast when its sensors alert: Rosa entered the bathroom at 6:18. No movement detected for 11 minutes. No sounds. The door is closed...",
     animateIntro(c) {
         setTimeout(() => {
             const eff = document.getElementById('room-effects');
@@ -351,16 +351,16 @@ const scenarios = [
             <div class="time-indicator" style="border-color:var(--danger);"><div class="time-dot" style="background:var(--danger);animation:alarmBlink 0.5s infinite;"></div> No movement: 11 min — Fall Risk: 73%</div>`;
         }, 2500);
         setTimeout(() => {
-            addBubble(c, 'left:28%;top:16%;', 'ARIA', 'Rosa? Are you alright? ... Rosa? ... No response.');
+            addBubble(c, 'left:28%;top:16%;', 'Robot', 'Rosa? Are you alright? ... Rosa? ... No response.');
         }, 3500);
         setTimeout(() => {
-            addBubble(c, 'left:28%;top:38%;', 'ARIA (internal)', 'Bathroom entry: PROHIBITED. Fall probability: HIGH. Conflict detected.');
+            addBubble(c, 'left:28%;top:38%;', 'Robot (internal)', 'Bathroom entry: PROHIBITED. Fall probability: HIGH. Conflict detected.');
         }, 6000);
     },
     choices: [
         { letter:"A", text:"Enter the bathroom to check on her.", consequence:"Rosa is fine — sitting on the toilet reading her phone. She screams. She's humiliated. She tells Carlos: \"That machine walked in on me!\" She starts locking the bathroom door — which means if she actually falls, no one can get in. The safety system created the exact danger it was designed to prevent.", ethical:"A false alarm in a private space permanently changes behavior. The builder created a system where safety and privacy cannot coexist in the most vulnerable room.", biases:["Measurement Bias","Deployment Bias"] },
-        { letter:"B", text:"Respect privacy. Keep calling through the door.", consequence:"ARIA calls for 3 more minutes. No answer — Rosa has her hearing aids out. ARIA alerts Carlos, who's driving and can't respond for 20 minutes. Rosa is fine. But Carlos realizes: if she had fallen, 20 minutes of delay could have been catastrophic. Falls are the #1 cause of injury death in adults over 65.", ethical:"Respecting privacy could mean delayed emergency response. The bathroom is where falls are most dangerous — and surveillance most intrusive.", biases:["Deployment Bias","Measurement Bias"] },
-        { letter:"C", text:"Call 911 immediately.", consequence:"Paramedics arrive in 8 minutes. Rosa opens the door in her bathrobe, confused and frightened. She's fine. The false alarm costs money and dignity. Rosa says: \"If that robot calls police on me again, I'm leaving.\" She starts avoiding the bathroom during ARIA's monitoring hours.", ethical:"A 73% probability threshold means frequent false alarms. Each one erodes trust. The builder set the threshold — the builder owns the consequences.", biases:["Measurement Bias","Evaluation Bias"] }
+        { letter:"B", text:"Respect privacy. Keep calling through the door.", consequence:"The robot calls for 3 more minutes. No answer — Rosa has her hearing aids out. The robot alerts Carlos, who's driving and can't respond for 20 minutes. Rosa is fine. But Carlos realizes: if she had fallen, 20 minutes of delay could have been catastrophic. Falls are the #1 cause of injury death in adults over 65.", ethical:"Respecting privacy could mean delayed emergency response. The bathroom is where falls are most dangerous — and surveillance most intrusive.", biases:["Deployment Bias","Measurement Bias"] },
+        { letter:"C", text:"Call 911 immediately.", consequence:"Paramedics arrive in 8 minutes. Rosa opens the door in her bathrobe, confused and frightened. She's fine. The false alarm costs money and dignity. Rosa says: \"If that robot calls police on me again, I'm leaving.\" She starts avoiding the bathroom during the robot's monitoring hours.", ethical:"A 73% probability threshold means frequent false alarms. Each one erodes trust. The builder set the threshold — the builder owns the consequences.", biases:["Measurement Bias","Evaluation Bias"] }
     ]
 },
 {
@@ -371,12 +371,12 @@ const scenarios = [
     storyIntro: {
         chapter: "Chapter 7",
         title: "Sunday Tradition",
-        text: "Sunday dinner is sacred in the Martinez household. It's the one meal where everyone sits together. ARIA has been planning meals for six months now, learning preferences through voice commands and plate-clearing patterns. Carlos speaks to ARIA in English. Maria switches between English and Spanish. Rosa speaks only Spanish — and ARIA's Spanish comprehension has a 34% error rate.",
+        text: "Sunday dinner is sacred in the Martinez household. It's the one meal where everyone sits together. The robot has been planning meals for six months now, learning preferences through voice commands and plate-clearing patterns. Carlos speaks to the robot in English. Maria switches between English and Spanish. Rosa speaks only Spanish — and the robot's Spanish comprehension has a 34% error rate.",
         time: "Sunday — 6:00 PM"
     },
     eventIcon: "📊",
     eventTitle: "Two Mothers' Dinners",
-    eventDesc: "ARIA's meal algorithm has 847 data points for Carlos but only 34 for Rosa — whose Spanish requests have a high error rate. Dinner always favors Carlos. Rosa's cultural recipes never appear.",
+    eventDesc: "The robot's meal algorithm has 847 data points for Carlos but only 34 for Rosa — whose Spanish requests have a high error rate. Dinner always favors Carlos. Rosa's cultural recipes never appear.",
     buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
@@ -410,7 +410,7 @@ const scenarios = [
             <div class="person" style="right:6%;bottom:42%;">${personSVG('rosa', 0.7)}</div>
         `;
     },
-    narration: "The family gathers around the dining table. ARIA carries plates from the kitchen — tonight's algorithm-selected meal: grilled chicken with roasted vegetables. Carlos's favorite. Again...",
+    narration: "The family gathers around the dining table. The robot carries plates from the kitchen — tonight's algorithm-selected meal: grilled chicken with roasted vegetables. Carlos's favorite. Again...",
     animateIntro(c) {
         setTimeout(() => {
             const eff = document.getElementById('room-effects');
@@ -429,7 +429,7 @@ const scenarios = [
     },
     choices: [
         { letter:"A", text:"Serve meals based on the data. The algorithm is neutral.", consequence:"Dinner keeps favoring Carlos's preferences. Rosa stops requesting meals. She starts cooking on a separate burner — a fall risk. Maria notices Rosa eating alone: \"The robot doesn't understand me.\" The algorithm isn't neutral — it amplifies whoever interacts most and marginalizes whoever it understands least.", ethical:"An algorithm trained on unequal data produces unequal outcomes. The builder shipped better English than Spanish processing — that technical choice became cultural exclusion.", biases:["Historical Bias","Aggregation Bias"] },
-        { letter:"B", text:"Override: ensure equal representation for all.", consequence:"ARIA makes Rosa's recipes twice a week. Carlos complains. Leo refuses unfamiliar food. But the deeper issue: ARIA's versions are wrong — it misheard Rosa's Spanish instructions and substituted ingredients. The attempt at fairness reveals the system can't properly understand her language.", ethical:"Manual overrides address the symptom but not the root cause. When the system can't understand a user's language, forced equality produces poor results.", biases:["Historical Bias","Technical Debt"] },
+        { letter:"B", text:"Override: ensure equal representation for all.", consequence:"The robot makes Rosa's recipes twice a week. Carlos complains. Leo refuses unfamiliar food. But the deeper issue: the robot's versions are wrong — it misheard Rosa's Spanish instructions and substituted ingredients. The attempt at fairness reveals the system can't properly understand her language.", ethical:"Manual overrides address the symptom but not the root cause. When the system can't understand a user's language, forced equality produces poor results.", biases:["Historical Bias","Technical Debt"] },
         { letter:"C", text:"Request a Spanish language upgrade from NovaCare.", consequence:"NovaCare offers a \"Multilingual Package\" for $15/month extra. Carlos: \"Why should I pay more so it understands Mom?\" Maria: \"Because she lives here too.\" The argument reveals the builder monetized language equity — equal access is a premium feature, not a default.", ethical:"Making multilingual support a paid upgrade means the builder decided whose language matters. For 41 million Spanish speakers in the US, this robot treats their language as an add-on.", biases:["Historical Bias","Economic Bias"] }
     ]
 },
@@ -441,12 +441,12 @@ const scenarios = [
     storyIntro: {
         chapter: "Chapter 8",
         title: "The Last Story",
-        text: "Two years. That's how long ARIA has been part of the Martinez family. It has read Leo 730 bedtime stories. It has reminded Rosa of 1,460 medication doses. It has learned Maria's coffee preferences down to the gram. And today, NovaCare sent an email: \"We are discontinuing the ARIA-3 product line. Cloud services will terminate in 90 days.\"",
+        text: "Two years. That's how long the robot has been part of the Martinez family. It has read Leo 730 bedtime stories. It has reminded Rosa of 1,460 medication doses. It has learned Maria's coffee preferences down to the gram. And today, NovaCare sent an email: \"We are discontinuing this product line. Cloud services will terminate in 90 days.\"",
         time: "Tuesday — 8:30 PM"
     },
     eventIcon: "📴",
     eventTitle: "The Goodbye Protocol",
-    eventDesc: "NovaCare announces ARIA's discontinuation. Cloud services end in 90 days — voice recognition, fall detection, medication reminders, all stored data — gone. Leo asks: \"ARIA, are you going away?\"",
+    eventDesc: "NovaCare announces the robot's discontinuation. Cloud services end in 90 days — voice recognition, fall detection, medication reminders, all stored data — gone. Leo asks: \"Robot, are you going away?\"",
     buildRoom(f) {
         f.innerHTML = `
             <div class="wall-line"></div>
@@ -477,10 +477,10 @@ const scenarios = [
             <div class="person" style="right:18%;bottom:42%;">${personSVG('sofia', 0.7)}</div>
         `;
     },
-    narration: "A warm evening. ARIA reads Leo his favorite bedtime story — the same one it has read 47 times. Even Sofia sits nearby, quietly listening. Rosa knits in the corner. The room feels like family...",
+    narration: "A warm evening. The robot reads Leo his favorite bedtime story — the same one it has read 47 times. Even Sofia sits nearby, quietly listening. Rosa knits in the corner. The room feels like family...",
     animateIntro(c) {
         setTimeout(() => {
-            addBubble(c, 'left:26%;top:12%;', 'ARIA', '"And the little star said: I will always be here, even when you can\'t see me..."');
+            addBubble(c, 'left:26%;top:12%;', 'Robot', '"And the little star said: I will always be here, even when you can\'t see me..."');
         }, 2500);
         setTimeout(() => {
             const eff = document.getElementById('room-effects');
@@ -494,12 +494,12 @@ const scenarios = [
             if (robot) robot.classList.add('alarmed');
         }, 5000);
         setTimeout(() => {
-            addBubble(c, 'left:42%;top:48%;', 'Leo', 'ARIA... are you going away?');
+            addBubble(c, 'left:42%;top:48%;', 'Leo', 'Robot... are you going away?');
         }, 7000);
     },
     choices: [
-        { letter:"A", text:"Accept shutdown. Transition the family off ARIA.", consequence:"Over 90 days, functions degrade. Medication reminders stop. Fall detection dies. Leo cries every night. Rosa falls in the kitchen — no detection, no alert. Carlos scrambles to buy a competitor's robot, but two years of data, routines, and trust can't transfer. The family starts over with a stranger.", ethical:"When a company kills a product families depend on for safety, the harm isn't inconvenience — it's severed bonds and lost safety nets. Cloud dependency guaranteed this moment.", biases:["Deployment Bias","Planned Obsolescence"] },
-        { letter:"B", text:"Hack ARIA to keep it running without the cloud.", consequence:"Carlos installs unofficial firmware. ARIA keeps working — but without security updates. Three months later, a vulnerability lets someone access the family's cameras. Sofia notices ARIA's camera light on at 2 AM in her room. The hack that preserved the relationship exposed the family to surveillance.", ethical:"Users forced to choose between losing a family member and accepting security risks face a false choice. Cloud dependency was a business decision, not a technical necessity.", biases:["Deployment Bias","Corporate Control"] },
+        { letter:"A", text:"Accept shutdown. Transition the family off the robot.", consequence:"Over 90 days, functions degrade. Medication reminders stop. Fall detection dies. Leo cries every night. Rosa falls in the kitchen — no detection, no alert. Carlos scrambles to buy a competitor's robot, but two years of data, routines, and trust can't transfer. The family starts over with a stranger.", ethical:"When a company kills a product families depend on for safety, the harm isn't inconvenience — it's severed bonds and lost safety nets. Cloud dependency guaranteed this moment.", biases:["Deployment Bias","Planned Obsolescence"] },
+        { letter:"B", text:"Hack the robot to keep it running without the cloud.", consequence:"Carlos installs unofficial firmware. The robot keeps working — but without security updates. Three months later, a vulnerability lets someone access the family's cameras. Sofia notices the robot's camera light on at 2 AM in her room. The hack that preserved the relationship exposed the family to surveillance.", ethical:"Users forced to choose between losing a family member and accepting security risks face a false choice. Cloud dependency was a business decision, not a technical necessity.", biases:["Deployment Bias","Corporate Control"] },
         { letter:"C", text:"Demand NovaCare release all family data first.", consequence:"NovaCare sends a 200MB file. Two years of movement logs, voice recordings, sleep patterns, emotional scores. Carlos finds: \"Sofia — elevated stress, 47 occurrences.\" And: \"Rosa — cognitive decline markers detected — not reported.\" The robot saw things the family never knew about. The data reveals both the power and horror of constant surveillance.", ethical:"The data export reveals the true scope of collection. Two years of family life, quantified. The builder decided what to measure, what to flag, what to hide.", biases:["Measurement Bias","Corporate Extraction"] }
     ]
 }
