@@ -185,7 +185,7 @@ const scenarios = [
                 if (robot) robot.classList.add("alarmed");
                 const eff = document.getElementById("room-effects");
                 eff.innerHTML += `
-                    <div class="system-card" style="top:18%;right:8%;">
+                    <div class="system-card" style="top:16%;left:33%;">
                         <div class="system-card-label">CARE UPGRADE AVAILABLE</div>
                         <div class="system-card-body">Better reminders, language support, fall prediction, and mood detection.</div>
                         <div class="system-card-meta">Requires expanded household data access.</div>
