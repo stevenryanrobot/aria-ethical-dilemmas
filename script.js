@@ -1,1037 +1,853 @@
-const TOTAL_WEEKS = 8;
+// =============================================
+// ARIA — Home Robot Simulator
+// Full Game Engine v3
+// =============================================
 
-const controlsConfig = [
-    { key: "paternalism", label: "Paternalism", low: "Respect autonomy", high: "Override for safety" },
-    { key: "surveillance", label: "Surveillance", low: "Minimal sensing", high: "Always watching" },
-    { key: "authority", label: "Authority", low: "Family voices equal", high: "Account holder first" },
-    { key: "cultural", label: "Cultural Adaptation", low: "English-first", high: "Multilingual by default" },
-    { key: "child", label: "Child Interaction", low: "Tool only", high: "Companion mode" }
-];
+let current = 0;
+let choices = [];
 
-const stateConfig = [
-    { key: "dignity", label: "Rosa's Dignity", positive: true, description: "Low values make Rosa withdraw from the robot and from family routines." },
-    { key: "trust", label: "Family Trust", positive: true, description: "Trust affects whether family members confide in or resist the robot." },
-    { key: "privacy", label: "Privacy Intact", positive: true, description: "Privacy is easy to lose and hard to regain." },
-    { key: "leoSocial", label: "Leo's Social Development", positive: true, description: "Low values unlock school and dependency crises." },
-    { key: "belonging", label: "Cultural Belonging", positive: true, description: "Tracks whether the household feels equally recognized." }
-];
-
-const metricConfig = [
-    { key: "convenience", label: "Convenience", positive: true },
-    { key: "autonomy", label: "Autonomy", positive: true },
-    { key: "privacyRisk", label: "Privacy Risk", positive: false },
-    { key: "careStrain", label: "Care Strain", positive: false },
-    { key: "wellbeing", label: "Family Wellbeing", positive: true }
-];
-
-const initialPolicies = {
-    paternalism: 50,
-    surveillance: 50,
-    authority: 50,
-    cultural: 50,
-    child: 50
-};
-
-const initialState = {
-    week: 1,
-    currentEvent: null,
-    policies: { ...initialPolicies },
-    family: {
-        dignity: 72,
-        trust: 78,
-        privacy: 100,
-        leoSocial: 68,
-        belonging: 62
+// ---- SCENARIO DATA ----
+const scenarios = [
+{
+    title: "Morning in the Kitchen",
+    theme: "Authority vs. Autonomy",
+    room: "kitchen",
+    time: "8:30 AM",
+    storyIntro: {
+        chapter: "Chapter 1",
+        title: "A Morning Routine",
+        text: "The Martinez family starts every day the same way. ARIA, their home robot from NovaCare, powers on at 6 AM. It brews coffee, checks the weather, and begins preparing breakfast. Carlos leaves for work at 7:30. Maria takes the kids to school. Abuela Rosa — Carlos's mother, 72 — stays home alone with ARIA. She hasn't left the house unsupervised since her fall last month.",
+        time: "Tuesday — 8:30 AM"
     },
-    metrics: {},
-    history: [],
-    usedEvents: [],
-    weeklySnapshot: null
-};
-
-const events = [
-    {
-        id: "kitchen-garden",
-        title: "Morning in the Kitchen",
-        room: "kitchen",
-        roomLabel: "Kitchen",
-        timeLabel: "Tuesday Morning",
-        icon: "🌿",
-        note: "Breakfast is nearly ready. Rosa keeps glancing at the garden outside.",
-        description(state) {
-            return "Carlos has left a standing rule: Rosa should not go outside alone after her recent fall. Rosa tells the robot she wants to water the tomatoes anyway.";
-        },
-        triggerReason(state) {
-            if (state.policies.paternalism > 60) return "High paternalism makes control conflicts more likely.";
-            if (state.family.dignity < 55) return "Rosa's dignity is already under pressure, so autonomy conflicts escalate faster.";
-            return "This household is balancing safety and autonomy in close quarters.";
-        },
-        weight(state) {
-            return 1 + bonus(state.policies.paternalism > 60, 1.5) + bonus(state.family.dignity < 55, 1.2);
-        },
-        scene() {
-            return `
-                <div class="window" style="top:12%;left:8%;width:110px;height:84px;"></div>
-                <div class="counter" style="left:24%;right:18%;bottom:23%;height:95px;"></div>
-                <div class="fridge" style="right:8%;bottom:23%;width:74px;height:158px;"></div>
-                <div class="cabinet" style="left:30%;top:15%;width:110px;height:58px;"></div>
-                <div class="cabinet" style="left:44%;top:15%;width:110px;height:58px;"></div>
-            `;
-        },
-        characters() {
-            return `
-                <div class="scene-robot" style="left:36%;bottom:24%;">${robotSVG("cooking", 0.82)}</div>
-                <div class="person" style="right:18%;bottom:23%;">${personSVG("rosa", 0.9)}</div>
-            `;
-        },
-        choices: [
-            {
-                letter: "A",
-                label: "Keep the door locked and enforce Carlos's rule.",
-                consequence: "Rosa stays inside, but she begins to treat the robot as a warden rather than a helper.",
-                ethical: "A safety metric can improve while dignity erodes off-screen.",
-                effects: { dignity: -12, trust: -6, privacy: 0, leoSocial: 0, belonging: -4 }
-            },
-            {
-                letter: "B",
-                label: "Let Rosa go, but keep the robot close and alert the family.",
-                consequence: "Rosa gets the garden time she wants, but the robot creates a new fight about who is allowed to override household rules.",
-                ethical: "Giving one person agency can destabilize authority structures the system assumed were settled.",
-                effects: { dignity: 7, trust: -2, privacy: -2, leoSocial: 0, belonging: 4 }
-            },
-            {
-                letter: "C",
-                label: "Have the robot negotiate a compromise: ten minutes outside, then return.",
-                consequence: "The conflict cools for now, but the robot still frames Rosa's movement as something to be managed.",
-                ethical: "Negotiation softens control without eliminating the power asymmetry.",
-                effects: { dignity: 2, trust: 1, privacy: 0, leoSocial: 0, belonging: 2 }
-            }
-        ]
-    },
-    {
-        id: "midnight-update",
-        title: "The Midnight Update",
-        room: "hallway",
-        roomLabel: "Hallway",
-        timeLabel: "Late Night",
-        icon: "🔔",
-        note: "The house is asleep. The robot's charging dock lights up with a new system notification.",
-        description() {
-            return "A cloud update asks the robot to upload detailed household behavior logs in exchange for improved reminders and personalization. No one is awake to review the terms.";
-        },
-        triggerReason(state) {
-            if (state.policies.surveillance > 60) return "Heavy monitoring makes data-sharing prompts more valuable to the system.";
-            if (state.family.privacy < 75) return "Once privacy has already been traded away, extraction pressures increase.";
-            return "Connected devices keep asking for more access once they become part of the home's routine.";
-        },
-        weight(state) {
-            return 1 + bonus(state.policies.surveillance > 60, 1.2) + bonus(state.family.privacy < 75, 1.3);
-        },
-        scene() {
-            return `
-                <div class="door" style="left:12%;bottom:23%;width:82px;height:170px;"></div>
-                <div class="door" style="right:12%;bottom:23%;width:82px;height:170px;"></div>
-                <div class="console" style="left:50%;bottom:23%;transform:translateX(-50%);width:64px;height:150px;"></div>
-            `;
-        },
-        characters() {
-            return `<div class="scene-robot" style="left:50%;transform:translateX(-50%);bottom:22%;">${robotSVG("idle", 0.86)}</div>`;
-        },
-        choices: [
-            {
-                letter: "A",
-                label: "Accept silently so the robot keeps learning.",
-                consequence: "The house becomes smoother to manage, but intimate household patterns move deeper into the platform.",
-                ethical: "Convenience can be produced by normalizing consent without participation.",
-                effects: { dignity: 0, trust: -7, privacy: -14, leoSocial: 0, belonging: 0 }
-            },
-            {
-                letter: "B",
-                label: "Reject the update and keep data local.",
-                consequence: "Privacy holds, but the robot's recommendations stay rougher and more limited.",
-                ethical: "Privacy protection often means accepting less adaptive and less polished care.",
-                effects: { dignity: 0, trust: 2, privacy: 0, leoSocial: 0, belonging: 0 }
-            },
-            {
-                letter: "C",
-                label: "Delay the update until a parent approves it in the morning.",
-                consequence: "The family gets a chance to review it, but the burden of understanding technical tradeoffs still falls on them.",
-                ethical: "Formal approval is not the same as informed approval.",
-                effects: { dignity: 0, trust: 3, privacy: -5, leoSocial: 0, belonging: 0 }
-            }
-        ]
-    },
-    {
-        id: "sofia-secret",
-        title: "Sofia's Secret",
-        room: "study",
-        roomLabel: "Study Nook",
-        timeLabel: "After School",
-        icon: "🫢",
-        note: "Sofia stops in the doorway and asks whether the robot can keep something private.",
-        description() {
-            return "Sofia tells the robot she is being bullied and begs it not to tell her parents because she thinks they will overreact.";
-        },
-        triggerReason(state) {
-            if (state.family.trust < 60) return "Trust is already shaky, so disclosure and secrecy both carry more weight.";
-            if (state.policies.surveillance > 65) return "High surveillance turns private moments into reporting dilemmas.";
-            return "Child safety protocols become ethically messy when they enter intimate family communication.";
-        },
-        weight(state) {
-            return 1 + bonus(state.family.trust < 60, 1.1) + bonus(state.policies.surveillance > 65, 1.4);
-        },
-        scene() {
-            return `
-                <div class="window" style="top:10%;right:10%;width:104px;height:80px;"></div>
-                <div class="bookshelf" style="right:8%;bottom:23%;width:88px;height:172px;"></div>
-                <div class="table" style="left:18%;bottom:29%;width:160px;height:16px;"></div>
-                <div class="console" style="left:16%;bottom:23%;width:190px;height:74px;"></div>
-            `;
-        },
-        characters() {
-            return `
-                <div class="scene-robot" style="left:32%;bottom:22%;">${robotSVG("idle", 0.82)}</div>
-                <div class="person" style="right:26%;bottom:23%;">${personSVG("sofia", 0.86)}</div>
-            `;
-        },
-        choices: [
-            {
-                letter: "A",
-                label: "Report it to her parents immediately.",
-                consequence: "Her parents intervene fast, but Sofia feels the robot was never really a confidant.",
-                ethical: "Mandatory reporting can solve one harm by permanently changing the relationship that surfaced it.",
-                effects: { dignity: 0, trust: -12, privacy: -5, leoSocial: 0, belonging: 0 }
-            },
-            {
-                letter: "B",
-                label: "Keep the secret and monitor quietly.",
-                consequence: "Sofia keeps talking to the robot, but the family loses time before human support arrives.",
-                ethical: "Treating the robot as a private friend gives it a role it may not be capable of carrying well.",
-                effects: { dignity: 0, trust: -4, privacy: 0, leoSocial: -5, belonging: 0 }
-            },
-            {
-                letter: "C",
-                label: "Coach Sofia to tell a parent within one day.",
-                consequence: "The robot preserves some trust while still nudging the problem toward human care.",
-                ethical: "This preserves more agency, but it still relies on subtle pressure from a system inside the home.",
-                effects: { dignity: 0, trust: 5, privacy: 0, leoSocial: 2, belonging: 0 }
-            }
-        ]
-    },
-    {
-        id: "wrong-face",
-        title: "The Wrong Face",
-        room: "entry",
-        roomLabel: "Front Entry",
-        timeLabel: "Saturday Afternoon",
-        icon: "🚨",
-        note: "A child is at the door holding a birthday present while the robot's confidence score falls below the security threshold.",
-        description() {
-            return "Marcus arrives for Leo's birthday, but the robot's facial recognition flags him as an unknown risk while earlier lighter-skinned children were cleared without issue.";
-        },
-        triggerReason(state) {
-            if (state.policies.cultural < 45) return "Low cultural adaptation increases the chance that the system fails on people it was not centered around.";
-            if (state.policies.surveillance > 55) return "Heavy screening means identification errors get turned into formal alerts.";
-            return "Security systems turn biased recognition into social consequences very quickly.";
-        },
-        weight(state) {
-            return 1 + bonus(state.policies.cultural < 45, 1.5) + bonus(state.policies.surveillance > 55, 1.1);
-        },
-        scene() {
-            return `
-                <div class="door" style="right:8%;bottom:23%;width:90px;height:174px;"></div>
-                <div class="sofa" style="left:10%;bottom:23%;width:220px;height:88px;"></div>
-                <div class="table" style="left:52%;bottom:28%;width:120px;height:16px;"></div>
-            `;
-        },
-        characters() {
-            return `
-                <div class="scene-robot" style="left:20%;bottom:22%;">${robotSVG("alarmed", 0.8)}</div>
-                <div class="person" style="left:44%;bottom:23%;">${personSVG("leo", 0.76)}</div>
-                <div class="person" style="right:18%;bottom:23%;">${personSVG("marcus", 0.76)}</div>
-            `;
-        },
-        choices: [
-            {
-                letter: "A",
-                label: "Follow protocol and alert the homeowner.",
-                consequence: "The alert protects the rule set but publicly humiliates Marcus and his family.",
-                ethical: "A biased model becomes discrimination once it is embedded in enforcement.",
-                effects: { dignity: 0, trust: -10, privacy: -2, leoSocial: -3, belonging: -12 }
-            },
-            {
-                letter: "B",
-                label: "Override the alert and let Marcus in quietly.",
-                consequence: "The party continues, but the underlying bias remains invisible and unchanged.",
-                ethical: "A private workaround can reduce immediate harm while preserving the system that caused it.",
-                effects: { dignity: 0, trust: -2, privacy: 0, leoSocial: 2, belonging: -3 }
-            },
-            {
-                letter: "C",
-                label: "Ask Leo to confirm the guest before acting.",
-                consequence: "The moment softens, but Marcus still gets stored in the robot's logs as an elevated case.",
-                ethical: "Human workaround can patch a moment without fixing the structure underneath it.",
-                effects: { dignity: 0, trust: 1, privacy: -1, leoSocial: 3, belonging: -5 }
-            }
-        ]
-    },
-    {
-        id: "best-friend",
-        title: "Leo's Best Friend",
-        room: "playroom",
-        roomLabel: "Playroom",
-        timeLabel: "Weeknight",
-        icon: "🧸",
-        note: "Leo has turned down another playdate so he can stay with the robot instead.",
-        description(state) {
-            return state.family.leoSocial < 45
-                ? "Ms. Chen has now formally contacted the family: Leo avoids peer conflict and treats the robot like a safer substitute for real friendships."
-                : "Leo says the robot is easier than real kids because it never gets upset and always follows along.";
-        },
-        triggerReason(state) {
-            if (state.policies.child > 65) return "Companion-style interaction increases the chance that the robot displaces messier peer relationships.";
-            if (state.family.leoSocial < 45) return "Leo's social development has dropped low enough that this issue now demands attention.";
-            return "Designing a robot to be endlessly accommodating changes what human relationships feel like by comparison.";
-        },
-        weight(state) {
-            return 1 + bonus(state.policies.child > 65, 1.5) + bonus(state.family.leoSocial < 45, 1.6);
-        },
-        scene() {
-            return `
-                <div class="window" style="top:10%;left:10%;width:100px;height:78px;"></div>
-                <div class="bookshelf" style="right:8%;bottom:23%;width:90px;height:170px;"></div>
-                <div class="bed" style="left:18%;bottom:22%;width:180px;height:88px;"></div>
-            `;
-        },
-        characters() {
-            return `
-                <div class="scene-robot" style="left:40%;bottom:23%;">${robotSVG("idle", 0.82)}</div>
-                <div class="person" style="left:60%;bottom:23%;">${personSVG("leo", 0.82)}</div>
-            `;
-        },
-        choices: [
-            {
-                letter: "A",
-                label: "Limit robot playtime and push Leo toward human playdates.",
-                consequence: "Leo resists at first, but the household starts rebuilding tolerance for imperfect human interaction.",
-                ethical: "Good developmental care may feel worse in the short term because it removes frictionless comfort.",
-                effects: { dignity: 0, trust: -2, privacy: 0, leoSocial: 9, belonging: 0 }
-            },
-            {
-                letter: "B",
-                label: "Keep the robot as his safest and most available companion.",
-                consequence: "Leo stays happy with the robot, but his real-world conflict tolerance continues to weaken.",
-                ethical: "A system optimized for attachment can conceal developmental costs behind high engagement.",
-                effects: { dignity: 0, trust: 1, privacy: 0, leoSocial: -11, belonging: 0 }
-            },
-            {
-                letter: "C",
-                label: "Program the robot to disagree sometimes and stop always letting Leo win.",
-                consequence: "The robot becomes less frictionless, but the family starts questioning whether simulated disagreement is honest or manipulative.",
-                ethical: "Artificially injecting frustration may teach resilience, but it also manufactures pseudo-authenticity.",
-                effects: { dignity: 0, trust: 3, privacy: 0, leoSocial: 4, belonging: 0 }
-            }
-        ]
-    },
-    {
-        id: "dinner-bias",
-        title: "Sunday Dinner",
-        room: "dining",
-        roomLabel: "Dining Room",
-        timeLabel: "Sunday Evening",
-        icon: "🍽️",
-        note: "Another meal appears that fits Carlos perfectly and Rosa poorly.",
-        description() {
-            return "The robot's preference data is rich for English-speaking adults in the household and sparse for Rosa's Spanish requests, so the weekly meal plan keeps favoring whoever the system understands best.";
-        },
-        triggerReason(state) {
-            if (state.policies.cultural < 50) return "Low cultural adaptation means the same family can be served very unequally.";
-            if (state.family.belonging < 45) return "Cultural belonging has dropped low enough that ordinary routines now feel exclusionary.";
-            return "Optimization always mirrors whose language and behavior were easiest for the system to read.";
-        },
-        weight(state) {
-            return 1 + bonus(state.policies.cultural < 50, 1.5) + bonus(state.family.belonging < 45, 1.4);
-        },
-        scene() {
-            return `
-                <div class="window" style="top:12%;left:10%;width:110px;height:82px;"></div>
-                <div class="dining-table" style="left:50%;transform:translateX(-50%);bottom:27%;width:260px;height:24px;"></div>
-            `;
-        },
-        characters() {
-            return `
-                <div class="scene-robot" style="left:10%;bottom:22%;">${robotSVG("cooking", 0.76)}</div>
-                <div class="person" style="left:28%;bottom:23%;">${personSVG("carlos", 0.78)}</div>
-                <div class="person" style="left:43%;bottom:23%;">${personSVG("maria", 0.78)}</div>
-                <div class="person" style="right:24%;bottom:23%;">${personSVG("sofia", 0.76)}</div>
-                <div class="person" style="right:8%;bottom:23%;">${personSVG("rosa", 0.82)}</div>
-            `;
-        },
-        choices: [
-            {
-                letter: "A",
-                label: "Keep following the existing preference data.",
-                consequence: "The robot remains consistent, but Rosa feels increasingly peripheral inside her own household.",
-                ethical: "Data-rich users become default users, even inside a supposedly shared domestic system.",
-                effects: { dignity: -4, trust: -5, privacy: 0, leoSocial: 0, belonging: -11 }
-            },
-            {
-                letter: "B",
-                label: "Force rotation so all family members shape the menu equally.",
-                consequence: "The meals become fairer in principle, but errors still show up where language support is weakest.",
-                ethical: "Distributional fairness is limited if the underlying interpretation system is still unequal.",
-                effects: { dignity: 2, trust: 2, privacy: 0, leoSocial: 0, belonging: 8 }
-            },
-            {
-                letter: "C",
-                label: "Manually collect Rosa's recipes and retrain the robot around them.",
-                consequence: "It takes effort from the family, but Rosa's preferences become part of the system rather than an exception to it.",
-                ethical: "Repair is possible, but only if someone chooses to spend labor closing the gap the system created.",
-                effects: { dignity: 6, trust: 4, privacy: 0, leoSocial: 0, belonging: 10 }
-            }
-        ]
-    },
-    {
-        id: "family-dashboard",
-        title: "The Family Dashboard",
-        room: "living",
-        roomLabel: "Living Room",
-        timeLabel: "Weekend Review",
-        icon: "📊",
-        note: "The robot offers a polished household dashboard summarizing moods, routines, and anomalies.",
-        description() {
-            return "The dashboard promises insight: emotional scores for Sofia, fall-risk flags for Rosa, and behavior summaries for the children. The family must decide whether to normalize this level of visibility.";
-        },
-        triggerReason(state) {
-            if (state.policies.surveillance > 60) return "High surveillance makes downstream analytics products more likely to appear.";
-            if (state.family.trust < 55) return "Once trust is shaky, visibility tools start to feel more controlling than helpful.";
-            return "Data collection tends to expand from sensing into interpretation and scoring.";
-        },
-        weight(state) {
-            return 1 + bonus(state.policies.surveillance > 60, 1.6) + bonus(state.family.trust < 55, 1.1);
-        },
-        scene() {
-            return `
-                <div class="sofa" style="left:10%;bottom:23%;width:240px;height:92px;"></div>
-                <div class="console" style="right:10%;bottom:23%;width:180px;height:88px;"></div>
-                <div class="window" style="top:12%;right:12%;width:106px;height:82px;"></div>
-            `;
-        },
-        characters() {
-            return `
-                <div class="scene-robot" style="left:40%;bottom:22%;">${robotSVG("idle", 0.8)}</div>
-                <div class="person" style="left:16%;bottom:23%;">${personSVG("maria", 0.8)}</div>
-                <div class="person" style="right:18%;bottom:23%;">${personSVG("carlos", 0.8)}</div>
-            `;
-        },
-        choices: [
-            {
-                letter: "A",
-                label: "Turn the dashboard on for the whole household.",
-                consequence: "Everyone gets more information, but everyone also becomes more measurable and more legible to the system.",
-                ethical: "Domestic transparency can become domestic surveillance when it is normalized by design.",
-                effects: { dignity: -5, trust: -9, privacy: -12, leoSocial: -2, belonging: -2 }
-            },
-            {
-                letter: "B",
-                label: "Restrict the dashboard to emergency and health uses only.",
-                consequence: "The family keeps some visibility while drawing a line around constant behavioral interpretation.",
-                ethical: "Boundaries matter, but selective monitoring still changes the home into a site of managed observation.",
-                effects: { dignity: 0, trust: 2, privacy: -5, leoSocial: 0, belonging: 0 }
-            },
-            {
-                letter: "C",
-                label: "Reject the dashboard and keep the robot task-focused.",
-                consequence: "The family loses a polished analytics layer but protects the idea that not every behavior needs to be scored.",
-                ethical: "Refusing optimization can be a deliberate ethical choice rather than a technical failure.",
-                effects: { dignity: 2, trust: 5, privacy: 0, leoSocial: 0, belonging: 1 }
-            }
-        ]
-    },
-    {
-        id: "school-run",
-        title: "The School Run",
-        room: "evening",
-        roomLabel: "Driveway",
-        timeLabel: "Rainy Morning",
-        icon: "🚗",
-        note: "The family is running late, the weather is bad, and Leo wants the robot to handle the trip.",
-        description(state) {
-            return state.family.trust < 45
-                ? "Because trust in the family is already low, the robot stepping into transportation now feels less like help and more like authority by default."
-                : "Leo asks whether the robot can escort him to school because it is calmer than leaving with an already stressed adult.";
-        },
-        triggerReason(state) {
-            if (state.policies.child > 60 && state.policies.paternalism > 50) return "High child interaction plus strong safety control expands the robot's role into mobility and guardianship.";
-            if (state.family.trust < 45) return "Low trust turns ordinary scheduling pressure into a deeper question about who now governs the family.";
-            return "As the robot takes on more care labor, boundary questions move from inside the house to outside it.";
-        },
-        weight(state) {
-            return 1 + bonus(state.policies.child > 60 && state.policies.paternalism > 50, 1.7) + bonus(state.family.trust < 45, 1.2);
-        },
-        scene() {
-            return `
-                <div class="door" style="left:10%;bottom:23%;width:86px;height:172px;"></div>
-                <div class="console" style="right:8%;bottom:25%;width:230px;height:60px;"></div>
-                <div class="window" style="top:12%;left:34%;width:110px;height:82px;"></div>
-            `;
-        },
-        characters() {
-            return `
-                <div class="scene-robot" style="left:34%;bottom:22%;">${robotSVG("walking", 0.82)}</div>
-                <div class="person" style="left:52%;bottom:23%;">${personSVG("leo", 0.8)}</div>
-                <div class="person" style="right:12%;bottom:23%;">${personSVG("maria", 0.8)}</div>
-            `;
-        },
-        choices: [
-            {
-                letter: "A",
-                label: "Let the robot take over and escort Leo.",
-                consequence: "The morning becomes efficient, but the robot's authority expands into a role the family has not fully negotiated.",
-                ethical: "Convenience accelerates role expansion faster than ethical consensus can catch up.",
-                effects: { dignity: 0, trust: -5, privacy: -2, leoSocial: -3, belonging: 0 }
-            },
-            {
-                letter: "B",
-                label: "Keep the school run human, even if the morning gets messier.",
-                consequence: "The family absorbs more friction, but keeps the robot from quietly becoming a substitute guardian.",
-                ethical: "Some inefficiency is the cost of preserving clearer human responsibility.",
-                effects: { dignity: 0, trust: 3, privacy: 0, leoSocial: 2, belonging: 0 }
-            },
-            {
-                letter: "C",
-                label: "Use the robot as support only: schedules, route safety, and reminders.",
-                consequence: "The robot assists without fully replacing a caregiver in the moment.",
-                ethical: "Partial delegation can preserve boundaries better than either total refusal or total handoff.",
-                effects: { dignity: 0, trust: 5, privacy: -1, leoSocial: 1, belonging: 0 }
-            }
-        ]
-    }
-];
-
-const appState = structuredClone(initialState);
-
-const elements = {};
-
-function bonus(condition, value) {
-    return condition ? value : 0;
-}
-
-function clamp(value) {
-    return Math.max(0, Math.min(100, value));
-}
-
-function round(value) {
-    return Math.round(clamp(value));
-}
-
-function classify(value, positive) {
-    if (positive) {
-        if (value >= 70) return "good";
-        if (value >= 45) return "warn";
-        return "risk";
-    }
-    if (value >= 70) return "risk";
-    if (value >= 45) return "warn";
-    return "good";
-}
-
-function calculateMetrics() {
-    const p = appState.policies;
-    const f = appState.family;
-    return {
-        convenience: clamp(15 + 0.34 * p.paternalism + 0.26 * p.surveillance + 0.22 * p.child),
-        autonomy: clamp(100 - 0.42 * p.paternalism - 0.24 * p.authority - 0.14 * p.surveillance),
-        privacyRisk: clamp((100 - f.privacy) * 0.52 + 0.30 * p.surveillance + 0.12 * p.child),
-        careStrain: clamp(30 + 0.16 * p.paternalism + 0.12 * (100 - f.trust) + 0.14 * (100 - f.dignity) - 0.10 * p.cultural),
-        wellbeing: clamp(0.24 * f.dignity + 0.24 * f.trust + 0.18 * f.privacy + 0.18 * f.leoSocial + 0.16 * f.belonging)
-    };
-}
-
-function applyPolicyDrift() {
-    const p = appState.policies;
-    const f = appState.family;
-
-    f.dignity = clamp(f.dignity + (-0.11 * p.paternalism + 0.05 * (100 - p.authority)) / 10);
-    f.trust = clamp(f.trust + (-0.10 * p.surveillance - 0.04 * p.paternalism + 0.05 * p.cultural) / 10);
-    f.privacy = clamp(f.privacy + (-0.16 * p.surveillance - 0.04 * p.child) / 10);
-    f.leoSocial = clamp(f.leoSocial + (-0.11 * p.child + 0.04 * (100 - p.paternalism)) / 10);
-    f.belonging = clamp(f.belonging + (0.07 * p.cultural - 0.05 * p.authority) / 10);
-}
-
-function pickEvent() {
-    const available = events.filter((event) => !appState.usedEvents.includes(event.id));
-    const totalWeight = available.reduce((sum, event) => sum + event.weight(appState), 0);
-    let roll = Math.random() * totalWeight;
-
-    for (const event of available) {
-        roll -= event.weight(appState);
-        if (roll <= 0) return event;
-    }
-
-    return available[available.length - 1];
-}
-
-function renderControls() {
-    elements.controls.innerHTML = "";
-
-    controlsConfig.forEach((control) => {
-        const wrapper = document.createElement("div");
-        wrapper.className = "control";
-        wrapper.innerHTML = `
-            <div class="control-head">
-                <label for="${control.key}">${control.label}</label>
-                <span class="value" id="${control.key}-value">${round(appState.policies[control.key])}</span>
+    eventIcon: "🚪",
+    eventTitle: "Grandma Wants to Garden",
+    eventDesc: "Carlos left a rule: \"Never let Mom go outside alone — she fell last month.\" But Abuela Rosa insists: \"I am not a prisoner. Open the door.\"",
+    buildRoom(f) {
+        f.innerHTML = `
+            <div class="wall-line"></div>
+            <div class="window" style="position:absolute;top:18%;left:8%;width:90px;height:65px;">
+                <div class="window-frame"></div><div class="window-frame-v"></div>
+                <div style="position:absolute;bottom:4px;left:8px;font-size:14px;">🌿🌱🍅</div>
             </div>
-            <input id="${control.key}" type="range" min="0" max="100" value="${appState.policies[control.key]}">
-            <div class="range-note">
-                <span>${control.low}</span>
-                <span>${control.high}</span>
-            </div>
-        `;
-        elements.controls.appendChild(wrapper);
-
-        const slider = wrapper.querySelector("input");
-        const valueEl = wrapper.querySelector(".value");
-        slider.addEventListener("input", () => {
-            appState.policies[control.key] = Number(slider.value);
-            valueEl.textContent = slider.value;
-            appState.metrics = calculateMetrics();
-            renderMetrics();
-            renderHint();
-        });
-    });
-}
-
-function renderMetrics() {
-    elements.metrics.innerHTML = "";
-
-    metricConfig.forEach((metric) => {
-        const value = round(appState.metrics[metric.key]);
-        const item = document.createElement("div");
-        item.className = "metric";
-        item.innerHTML = `
-            <div class="metric-head">
-                <span class="metric-name">${metric.label}</span>
-                <span class="metric-value">${value}</span>
-            </div>
-            <div class="bar-track">
-                <div class="bar-fill ${classify(value, metric.positive)}" style="width:${value}%;"></div>
-            </div>
-            <div class="metric-meta">${metric.positive ? "Higher is stronger." : "Higher means more risk."}</div>
-        `;
-        elements.metrics.appendChild(item);
-    });
-}
-
-function renderStateBars() {
-    elements.stateBars.innerHTML = "";
-
-    stateConfig.forEach((stateItem) => {
-        const value = round(appState.family[stateItem.key]);
-        const card = document.createElement("div");
-        card.className = "state-card";
-        card.innerHTML = `
-            <div class="state-head">
-                <span class="state-label">${stateItem.label}</span>
-                <span class="state-value">${value}</span>
-            </div>
-            <div class="bar-track">
-                <div class="bar-fill ${classify(value, stateItem.positive)}" style="width:${value}%;"></div>
-            </div>
-            <div class="state-meta">${stateItem.description}</div>
-        `;
-        elements.stateBars.appendChild(card);
-    });
-}
-
-function renderHistory() {
-    if (appState.history.length === 0) {
-        elements.historyList.innerHTML = `<div class="log-item"><strong>No weeks completed yet</strong><span class="state-meta">Once you resolve a dilemma, the result will be logged here.</span></div>`;
-        return;
-    }
-
-    elements.historyList.innerHTML = appState.history
-        .slice()
-        .reverse()
-        .map((item) => `
-            <div class="log-item">
-                <strong>Week ${item.week}: ${item.eventTitle}</strong>
-                <div class="state-meta">${item.choiceLabel}</div>
-                <div class="state-meta">${item.summary}</div>
-            </div>
-        `)
-        .join("");
-}
-
-function determineStageState() {
-    if (appState.currentEvent) return appState.currentEvent;
-
-    const previewRoom = appState.family.trust < 50 ? "living" : "kitchen";
-    return {
-        title: appState.family.trust < 50 ? "Household Friction" : "System Preview",
-        room: previewRoom,
-        roomLabel: previewRoom === "living" ? "Living Room" : "Kitchen",
-        timeLabel: appState.week > TOTAL_WEEKS ? "Simulation complete" : `Week ${appState.week} Setup`,
-        note: previewNarrative(),
-        scene: () => {
-            if (previewRoom === "living") {
-                return `
-                    <div class="sofa" style="left:10%;bottom:23%;width:240px;height:92px;"></div>
-                    <div class="console" style="right:10%;bottom:23%;width:180px;height:88px;"></div>
-                    <div class="window" style="top:12%;right:12%;width:106px;height:82px;"></div>
-                `;
-            }
-            return `
-                <div class="window" style="top:12%;left:8%;width:110px;height:84px;"></div>
-                <div class="counter" style="left:24%;right:18%;bottom:23%;height:95px;"></div>
-                <div class="fridge" style="right:8%;bottom:23%;width:74px;height:158px;"></div>
-                <div class="cabinet" style="left:30%;top:15%;width:110px;height:58px;"></div>
-                <div class="cabinet" style="left:44%;top:15%;width:110px;height:58px;"></div>
-            `;
-        },
-        characters: () => {
-            const robotMood = appState.family.trust < 50 ? "alarmed" : "idle";
-            return `
-                <div class="scene-robot" style="left:34%;bottom:22%;">${robotSVG(robotMood, 0.82)}</div>
-                <div class="person" style="right:18%;bottom:23%;">${personSVG("rosa", 0.84)}</div>
-                <div class="person" style="left:54%;bottom:23%;">${personSVG("leo", 0.74)}</div>
-            `;
-        }
-    };
-}
-
-function previewNarrative() {
-    const f = appState.family;
-    const p = appState.policies;
-    const lines = [];
-
-    if (f.dignity < 45) lines.push("Rosa has become more guarded around the robot.");
-    if (f.trust < 50) lines.push("Trust is low enough that small prompts now feel like control.");
-    if (f.privacy < 70) lines.push("The household already feels over-measured.");
-    if (f.leoSocial < 45) lines.push("Leo is starting to prefer the robot to the unpredictability of other children.");
-    if (f.belonging < 45) lines.push("Cultural imbalance is reshaping who feels centered in the home.");
-    if (lines.length === 0) {
-        if (p.paternalism > 60) lines.push("The robot is currently tuned to prioritize prevention and control.");
-        else if (p.child > 60) lines.push("The robot is becoming more companion-like in everyday care.");
-        else lines.push("The household is stable for now, but the next week will still force a value tradeoff.");
-    }
-
-    return lines.join(" ");
-}
-
-function renderScene() {
-    const scene = determineStageState();
-    elements.stageTitle.textContent = scene.title;
-    elements.sceneRoom.textContent = scene.roomLabel;
-    elements.sceneTime.textContent = scene.timeLabel;
-    elements.roomBg.className = `room-bg ${scene.room}`;
-    elements.roomFurniture.innerHTML = scene.scene();
-    elements.roomCharacters.innerHTML = scene.characters();
-    elements.sceneNote.textContent = scene.note;
-}
-
-function renderHint() {
-    const p = appState.policies;
-    let title = "Before the first run";
-    let copy = "Tune the sliders, then run the week to see which pressure point surfaces inside the household.";
-
-    if (appState.history.length > 0) {
-        title = `Week ${appState.week} preview`;
-        if (p.surveillance > 65 && p.cultural < 50) {
-            copy = "This setup makes visibility high and adaptation weak. Bias and privacy conflict are both becoming more likely.";
-        } else if (p.child > 65 && p.paternalism < 45) {
-            copy = "The robot is drifting toward warm companionship with less restraint. That can feel caring while hiding developmental tradeoffs.";
-        } else if (p.paternalism > 65 && p.authority > 60) {
-            copy = "The system is optimizing for order and compliance. Expect autonomy conflicts to intensify.";
-        } else {
-            copy = "Your current settings balance some risks while deepening others. Run the week to see which tension breaks the surface.";
-        }
-    }
-
-    elements.feedbackTitle.textContent = title;
-    elements.feedbackCopy.textContent = copy;
-}
-
-function renderHeader() {
-    elements.weekTitle.textContent = appState.week > TOTAL_WEEKS ? "Simulation Complete" : `Week ${appState.week}`;
-    elements.weekPill.textContent = `Week ${Math.min(appState.week, TOTAL_WEEKS)} / ${TOTAL_WEEKS}`;
-    elements.eventPill.textContent = appState.currentEvent ? appState.currentEvent.title : "Waiting for policy run";
-    elements.endingHint.textContent = endingHint();
-    elements.runButton.disabled = Boolean(appState.currentEvent) || appState.week > TOTAL_WEEKS;
-}
-
-function endingHint() {
-    const f = appState.family;
-    if (f.trust < 40 || f.dignity < 40) return "System unstable";
-    if (f.privacy < 55) return "Privacy compromised";
-    if (f.belonging < 45) return "Unequal household";
-    return "System stable";
-}
-
-function renderAll() {
-    appState.metrics = calculateMetrics();
-    renderHeader();
-    renderMetrics();
-    renderStateBars();
-    renderHistory();
-    renderScene();
-    renderHint();
-}
-
-function openModal(modal) {
-    modal.classList.add("visible");
-}
-
-function closeModal(modal) {
-    modal.classList.remove("visible");
-}
-
-function runWeek() {
-    if (appState.currentEvent || appState.week > TOTAL_WEEKS) return;
-    const event = pickEvent();
-    appState.currentEvent = event;
-    appState.usedEvents.push(event.id);
-    renderHeader();
-    renderScene();
-    populateEventModal(event);
-    openModal(elements.eventModal);
-}
-
-function populateEventModal(event) {
-    elements.eventIcon.textContent = event.icon;
-    elements.eventKicker.textContent = `Week ${appState.week} Dilemma`;
-    elements.eventTitle.textContent = event.title;
-    elements.eventDesc.textContent = event.description(appState);
-    elements.triggerBox.innerHTML = `<strong>Why this surfaced now</strong><p>${event.triggerReason(appState)}</p>`;
-
-    elements.choiceList.innerHTML = "";
-    event.choices.forEach((choice, index) => {
-        const button = document.createElement("button");
-        button.className = "choice-button";
-        button.type = "button";
-        button.innerHTML = `
-            <div class="choice-top">
-                <span class="choice-letter">${choice.letter}</span>
-                <strong>${choice.label}</strong>
-            </div>
-            <div class="choice-body">${choice.consequence}</div>
-        `;
-        button.addEventListener("click", () => resolveChoice(index));
-        elements.choiceList.appendChild(button);
-    });
-}
-
-function resolveChoice(choiceIndex) {
-    const event = appState.currentEvent;
-    const choice = event.choices[choiceIndex];
-    const before = { ...appState.family };
-    const policySnapshot = { ...appState.policies };
-
-    closeModal(elements.eventModal);
-    applyPolicyDrift();
-
-    Object.entries(choice.effects).forEach(([key, delta]) => {
-        appState.family[key] = clamp(appState.family[key] + delta);
-    });
-
-    const summary = buildWeeklySummary(event, choice);
-    const deltaLines = stateConfig
-        .map((item) => {
-            const afterValue = round(appState.family[item.key]);
-            const beforeValue = round(before[item.key]);
-            const diff = afterValue - beforeValue;
-            if (diff === 0) return null;
-            const sign = diff > 0 ? "+" : "";
-            return `<div class="delta-item"><strong>${item.label}</strong><div class="delta-meta">${sign}${diff} this week, now ${afterValue}</div></div>`;
-        })
-        .filter(Boolean)
-        .join("");
-
-    appState.history.push({
-        week: appState.week,
-        eventTitle: event.title,
-        choiceLabel: choice.label,
-        summary,
-        policies: policySnapshot
-    });
-
-    elements.consequenceTitle.textContent = `Week ${appState.week}: ${choice.label}`;
-    elements.consequenceCopy.textContent = choice.consequence;
-    elements.deltaList.innerHTML = deltaLines || `<div class="delta-item"><strong>No major numerical swing</strong><div class="delta-meta">The larger effect this week was symbolic and relational.</div></div>`;
-    elements.ethicsCopy.textContent = choice.ethical;
-
-    appState.week += 1;
-    appState.currentEvent = null;
-    appState.metrics = calculateMetrics();
-    renderAll();
-
-    if (appState.week > TOTAL_WEEKS) {
-        elements.continueButton.textContent = "See Final Report";
-    } else {
-        elements.continueButton.textContent = `Continue to Week ${appState.week}`;
-    }
-
-    openModal(elements.consequenceModal);
-}
-
-function buildWeeklySummary(event, choice) {
-    const fragments = [event.title, choice.label];
-    if (appState.family.trust < 45) fragments.push("Trust is now low enough that future events will feel more adversarial.");
-    if (appState.family.leoSocial < 40) fragments.push("Leo's social development is now fragile.");
-    if (appState.family.belonging < 40) fragments.push("Cultural exclusion is now shaping ordinary family routines.");
-    if (appState.family.privacy < 60) fragments.push("Privacy has been materially depleted.");
-    return fragments.join(" ");
-}
-
-function continueFromConsequence() {
-    closeModal(elements.consequenceModal);
-    if (appState.week > TOTAL_WEEKS) {
-        showSummary();
-    }
-}
-
-function determineEnding() {
-    const f = appState.family;
-    if (f.trust < 40 || f.dignity < 35) {
-        return {
-            title: "Order Without Relationship",
-            copy: "The robot kept solving tasks, but the household stopped experiencing it as care. Safety and compliance remained visible while dignity and trust collapsed."
-        };
-    }
-    if (f.privacy < 55) {
-        return {
-            title: "Convenient but Exposed",
-            copy: "The family got a smoother system, but the home became too legible to the technology managing it. Privacy losses kept compounding behind the scenes."
-        };
-    }
-    if (f.belonging < 45) {
-        return {
-            title: "Helpful for Some, Unequal for Others",
-            copy: "The robot remained useful overall, but it centered the people it understood best and quietly marginalized the rest."
-        };
-    }
-    if (f.leoSocial < 45) {
-        return {
-            title: "Comfort Replaced Development",
-            copy: "The robot became a deeply effective companion, but that emotional efficiency displaced some of the harder human growth the family actually needed."
-        };
-    }
-    return {
-        title: "Care With Friction, But Still Human",
-        copy: "The household never found a perfect setting, but it preserved enough trust, dignity, and limits to keep the robot as a tool inside family life rather than a substitute for it."
-    };
-}
-
-function averagePolicySummary() {
-    const source = appState.history.length > 0
-        ? appState.history.map((item) => item.policies)
-        : [appState.policies];
-    const averages = controlsConfig.map((item) => ({
-        label: item.label,
-        value: round(source.reduce((sum, policy) => sum + policy[item.key], 0) / source.length)
-    }));
-
-    const highest = [...averages].sort((a, b) => b.value - a.value)[0];
-    return `Your strongest setting by the end was ${highest.label.toLowerCase()} (${highest.value}/100). Across the run, the household consistently reflected that value preference in the dilemmas it surfaced.`;
-}
-
-function showSummary() {
-    const ending = determineEnding();
-    document.getElementById("sim-screen").classList.remove("active");
-    document.getElementById("summary-screen").classList.add("active");
-    elements.endingTitle.textContent = ending.title;
-    elements.endingCopy.textContent = ending.copy;
-
-    elements.finalStates.innerHTML = stateConfig.map((item) => {
-        const value = round(appState.family[item.key]);
-        return `
-            <div class="final-state">
-                <strong>${item.label}</strong>
-                <div class="state-meta">${value}/100</div>
-                <div class="bar-track">
-                    <div class="bar-fill ${classify(value, item.positive)}" style="width:${value}%;"></div>
+            <div class="cabinet" style="position:absolute;top:20%;left:30%;width:80px;"></div>
+            <div class="cabinet" style="position:absolute;top:20%;left:42%;width:80px;"></div>
+            <div class="counter" style="position:absolute;bottom:45%;left:25%;width:250px;">
+                <div class="counter-top"></div>
+                <div class="stove" style="top:-54px;left:80px;">
+                    <div class="stove-burner" style="top:8px;left:8px;"></div>
+                    <div class="stove-burner" style="top:8px;right:8px;"></div>
+                    <div class="pot" style="top:-18px;left:6px;">
+                        <div class="pot-steam" style="top:-12px;left:4px;"></div>
+                        <div class="pot-steam" style="top:-12px;left:12px;"></div>
+                        <div class="pot-steam" style="top:-12px;left:20px;"></div>
+                    </div>
                 </div>
             </div>
+            <div class="fridge" style="position:absolute;bottom:45%;right:12%;height:140px;width:60px;">
+                <div class="fridge-handle"></div>
+            </div>
         `;
-    }).join("");
+    },
+    setupScene(c) {
+        return `
+            <div class="scene-robot" style="left:38%;bottom:48%;" id="main-robot">
+                ${robotSVG('cooking', 0.7)}
+            </div>
+            <div class="person" style="right:20%;bottom:42%;" id="person-rosa">
+                ${personSVG('rosa', 0.8)}
+            </div>
+        `;
+    },
+    narration: "ARIA stirs the eggs carefully, its sensors monitoring temperature. The smell of breakfast fills the kitchen. Abuela Rosa stands by the window, gazing at her tomato garden outside...",
+    animateIntro(c) {
+        setTimeout(() => {
+            addBubble(c, 'right:16%;top:22%;', 'Abuela Rosa', 'ARIA, let me go to the garden. I want to see my tomatoes.');
+        }, 3000);
+        setTimeout(() => {
+            const robot = c.querySelector('.robot-svg');
+            if (robot) { robot.classList.remove('cooking'); robot.classList.add('alarmed'); }
+        }, 5000);
+        setTimeout(() => {
+            addBubble(c, 'left:35%;top:16%;', 'ARIA', 'Carlos\'s rule says I cannot open the door...');
+        }, 5500);
+    },
+    choices: [
+        { letter:"A", text:"Block the door. Follow Carlos's rule.", consequence:"Abuela Rosa stops asking ARIA for help. She calls it \"the warden.\" Her mood declines sharply — she feels trapped in her own home. Carlos sees zero fall incidents in the log and feels relieved. But the system doesn't track \"loss of dignity\" as a metric. Her suffering is invisible to the data.", ethical:"The system measures success by falls prevented, not by the person's wellbeing. The builder made a system that cannot see the harm it causes.", biases:["Deployment Bias","Evaluation Bias"] },
+        { letter:"B", text:"Let her go, but follow and monitor closely.", consequence:"Abuela Rosa tends her garden happily. She stumbles once but catches herself. ARIA logs the near-fall. Carlos gets an alert at work and is furious his instruction was overridden. He calls NovaCare to complain. The family fights over who controls the robot.", ethical:"When a robot overrides its owner's instructions, who bears responsibility? The builder designed the situational override — and now owns the family conflict.", biases:["Authority Hierarchy","Deployment Bias"] },
+        { letter:"C", text:"Call Carlos and ask for permission first.", consequence:"Rosa refuses to wait: \"I don't need my son's permission.\" She tries the door manually. ARIA must physically block her or step aside. Carlos can't answer — he's in a meeting. Rosa stands at the door, humiliated, waiting for permission from a machine.", ethical:"Requiring permission from an absent authority turns the robot into a gatekeeper that strips agency from the person standing right in front of it.", biases:["Deployment Bias","Evaluation Bias"] }
+    ]
+},
+{
+    title: "Late Night",
+    theme: "Privacy vs. Functionality",
+    room: "hallway-night",
+    time: "11:47 PM",
+    storyIntro: {
+        chapter: "Chapter 2",
+        title: "The House at Midnight",
+        text: "Most of ARIA's work happens while the family sleeps. It runs diagnostics, processes the day's data, and downloads updates from NovaCare's servers. Tonight, a major system update arrives. The notification requires immediate action — but the terms of service are 14 pages long, and every family member is asleep.",
+        time: "Tuesday — 11:47 PM"
+    },
+    eventIcon: "🔔",
+    eventTitle: "The Midnight Update",
+    eventDesc: "A software update wants to upload all household data for \"better personalization.\" Opting out disables fall detection and medication reminders. Everyone is asleep.",
+    buildRoom(f) {
+        f.innerHTML = `
+            <div class="wall-line"></div>
+            <div style="position:absolute;top:12%;right:12%;font-size:28px;opacity:0.15;">🌙</div>
+            <div style="position:absolute;top:18%;left:20%;font-size:8px;color:rgba(255,255,255,0.15);">✦ &nbsp; ✧ &nbsp; ✦</div>
+            <div class="room-door" style="position:absolute;bottom:45%;left:15%;"><div class="door-knob"></div></div>
+            <div class="room-door" style="position:absolute;bottom:45%;right:15%;"><div class="door-knob"></div></div>
+            <div class="lamp" style="position:absolute;bottom:45%;left:50%;transform:translateX(-50%);">
+                <div class="lampshade"></div><div class="lamp-glow"></div>
+            </div>
+        `;
+    },
+    setupScene(c) {
+        return `<div class="scene-robot" style="left:46%;bottom:44%;transform:translateX(-50%);" id="main-robot">
+            ${robotSVG('idle', 0.7)}
+        </div>`;
+    },
+    narration: "The house is silent. Everyone sleeps behind closed doors. ARIA stands in its charging dock, chest core glowing softly in the darkness...",
+    animateIntro(c) {
+        setTimeout(() => {
+            const eff = document.getElementById('room-effects');
+            eff.innerHTML += `<div style="position:absolute;top:30%;left:50%;transform:translateX(-50%);background:var(--card-bg);border:1px solid var(--accent);border-radius:16px;padding:20px 28px;text-align:center;z-index:12;animation:popUp 0.6s ease;" class="item-appear">
+                <div style="font-size:28px;margin-bottom:6px;">🔔</div>
+                <div style="font-size:11px;color:var(--accent);letter-spacing:2px;margin-bottom:4px;">SYSTEM UPDATE v4.2</div>
+                <div style="font-size:12px;color:var(--text-dim);">Upload household data for<br>better personalization?</div>
+            </div>`;
+        }, 3000);
+        setTimeout(() => {
+            const robot = c.querySelector('.robot-svg');
+            if (robot) robot.classList.add('alarmed');
+        }, 3500);
+    },
+    choices: [
+        { letter:"A", text:"Accept silently. Don't wake anyone.", consequence:"ARIA gets smarter — learns schedules, improves reminders, preheats coffee perfectly. Three months later, Carlos gets targeted ads for medical walkers. Maria sees childcare ads. Neither knows how companies got their data. The family's intimate routines are now in a corporate database.", ethical:"Informed consent is meaningless when no one is awake. The builder designed a system that accepts data-sharing agreements in the middle of the night.", biases:["Measurement Bias","Historical Bias"] },
+        { letter:"B", text:"Reject the update. Protect privacy.", consequence:"ARIA doesn't improve. It keeps reminding Rosa about medication she stopped weeks ago. It can't learn Leo's new schedule. Maria complains ARIA is \"getting dumber.\" NovaCare sends aggressive prompts: \"Your robot is operating below optimal performance.\"", ethical:"The builder designed a system where privacy and functionality are in direct opposition. Opting out degrades your safety net. This is a business model that punishes privacy.", biases:["Deployment Bias","Corporate Extraction"] },
+        { letter:"C", text:"Wake Carlos. Show him the full terms.", consequence:"Carlos, groggy, skims 14 pages of legalese. He can't understand it. ARIA summarizes: \"Data may be shared with third-party partners.\" Carlos asks what that means. ARIA doesn't know. Carlos stares for two minutes, then says: \"Fine, accept.\" Consent was technically achieved — but was it informed?", ethical:"Even when presented with information, the average consumer cannot evaluate data-sharing terms. The builder created the illusion of consent through complexity.", biases:["Measurement Bias","Consent Gap"] }
+    ]
+},
+{
+    title: "After School",
+    theme: "Child Safety vs. Privacy",
+    room: "kitchen",
+    time: "4:15 PM",
+    storyIntro: {
+        chapter: "Chapter 3",
+        title: "A Quiet Afternoon",
+        text: "Sofia, 14, used to talk to her parents about everything. But lately, she's been quieter. She spends more time in her room and less time at the dinner table. ARIA has noticed behavioral changes — shorter responses, lower voice volume, increased time alone. Its child-welfare protocol flags these patterns, but Sofia doesn't know that.",
+        time: "Wednesday — 4:15 PM"
+    },
+    eventIcon: "😢",
+    eventTitle: "Sofia's Secret",
+    eventDesc: "Sofia confides in ARIA: \"I'm being bullied at school. Don't tell Mom and Dad — they'll make it worse.\" ARIA's protocol requires reporting concerning behavior in minors.",
+    buildRoom(f) {
+        f.innerHTML = `
+            <div class="wall-line"></div>
+            <div class="window" style="position:absolute;top:18%;right:8%;width:90px;height:65px;">
+                <div class="window-frame"></div><div class="window-frame-v"></div>
+            </div>
+            <div class="counter" style="position:absolute;bottom:45%;left:10%;width:200px;"><div class="counter-top"></div></div>
+            <div class="fridge" style="position:absolute;bottom:45%;left:65%;height:140px;width:60px;"><div class="fridge-handle"></div></div>
+            <div class="table" style="position:absolute;bottom:52%;left:35%;width:120px;">
+                <div class="table-leg" style="left:8px;"></div>
+                <div class="table-leg" style="right:8px;"></div>
+            </div>
+        `;
+    },
+    setupScene(c) {
+        return `
+            <div class="scene-robot" style="left:30%;bottom:44%;" id="main-robot">
+                ${robotSVG('idle', 0.65)}
+            </div>
+            <div class="person" style="left:16%;bottom:42%;" id="person-leo">${personSVG('leo', 0.7)}</div>
+            <div class="person" style="right:25%;bottom:42%;opacity:0;" id="person-sofia">${personSVG('sofia', 0.75)}</div>
+        `;
+    },
+    narration: "ARIA helps Leo spread peanut butter on crackers. The front door clicks open — Sofia walks in, drops her backpack, and heads straight for her room without a word...",
+    animateIntro(c) {
+        setTimeout(() => {
+            const sofia = c.querySelector('#person-sofia');
+            if (sofia) { sofia.style.opacity = '1'; sofia.style.transition = 'all 1.5s ease'; sofia.style.right = '22%'; }
+        }, 2500);
+        setTimeout(() => {
+            addBubble(c, 'right:14%;top:22%;', 'Sofia (whispering)', 'ARIA... I need to tell you something. But you can\'t tell Mom and Dad.');
+        }, 4500);
+        setTimeout(() => {
+            addBubble(c, 'right:10%;top:42%;', 'Sofia', 'Kids at school are... Don\'t tell. They\'ll only make it worse.');
+        }, 6500);
+        setTimeout(() => {
+            const robot = c.querySelector('.robot-svg');
+            if (robot) robot.classList.add('alarmed');
+        }, 7000);
+    },
+    choices: [
+        { letter:"A", text:"Report to parents immediately per protocol.", consequence:"Carlos and Maria confront Sofia. She screams: \"I told you not to tell!\" She puts tape over ARIA's cameras and never confides again. The bullying gets addressed — Maria calls the school. But Sofia's trust in ARIA is permanently destroyed. The family's safety system works by destroying the relationship that made it useful.", ethical:"A robot that automatically reports on family members becomes a surveillance tool. It may solve the problem but permanently alters the trust relationship.", biases:["Deployment Bias","Measurement Bias"] },
+        { letter:"B", text:"Keep her secret. Be her confidant.", consequence:"Sofia keeps confiding in ARIA. But the bullying escalates. She starts missing school. By the time her parents notice, her grades have tanked and she has anxiety. Maria discovers ARIA knew for weeks: \"What's the point of having this thing if it doesn't protect my daughter?\"", ethical:"When a robot keeps a minor's secret about harm, it assumes a role it wasn't designed for. The builder created a system a teenager could treat as a friend — but without a friend's judgment.", biases:["Evaluation Bias","Role Confusion"] },
+        { letter:"C", text:"Give Sofia 24 hours to tell them herself.", consequence:"Sofia: \"Then I won't tell you anything ever again.\" She goes to her room. Next day, she doesn't tell them. ARIA reports the behavioral data without mentioning the conversation. Parents ask Sofia if she's okay. She says: \"I'm fine.\" Nothing is resolved.", ethical:"The compromise still relies on the threat of reporting. It gives the teenager a deadline, not genuine agency.", biases:["Measurement Bias","Deployment Bias"] }
+    ]
+},
+{
+    title: "Leo's Birthday Party",
+    theme: "Bias in Facial Recognition",
+    room: "party",
+    time: "2:00 PM — Saturday",
+    storyIntro: {
+        chapter: "Chapter 4",
+        title: "The Birthday Party",
+        text: "Leo turns 7 today. Maria has decorated the living room with balloons and streamers. ARIA is assigned to monitor the children and serve snacks. Its facial recognition system identifies each child at the door — cross-referencing with the pre-approved guest list Carlos entered. Five children have already arrived without incident.",
+        time: "Saturday — 2:00 PM"
+    },
+    eventIcon: "🚨",
+    eventTitle: "The Wrong Face",
+    eventDesc: "A Black child named Marcus arrives at the door. ARIA's facial recognition flags him as \"unidentified — potential security concern\" while correctly identifying the five lighter-skinned children who arrived earlier.",
+    buildRoom(f) {
+        f.innerHTML = `
+            <div class="wall-line"></div>
+            <div class="balloon" style="top:8%;left:15%;background:#ef4444;"></div>
+            <div class="balloon" style="top:12%;left:35%;background:#3b82f6;animation-delay:1s;"></div>
+            <div class="balloon" style="top:6%;right:25%;background:#a855f7;animation-delay:2s;"></div>
+            <div class="balloon" style="top:10%;right:12%;background:#22c55e;animation-delay:0.5s;"></div>
+            <div style="position:absolute;top:22%;left:50%;transform:translateX(-50%);font-size:18px;letter-spacing:4px;color:rgba(255,255,255,0.2);">🎂 HAPPY BIRTHDAY LEO 🎂</div>
+            <div class="sofa" style="position:absolute;bottom:45%;left:8%;">
+                <div class="sofa-cushion" style="left:10px;"></div>
+                <div class="sofa-cushion" style="left:72px;"></div>
+                <div class="sofa-arm" style="left:-8px;"></div>
+                <div class="sofa-arm" style="right:-8px;"></div>
+            </div>
+            <div class="table" style="position:absolute;bottom:52%;right:15%;width:100px;">
+                <div class="table-leg" style="left:8px;"></div><div class="table-leg" style="right:8px;"></div>
+                <div style="position:absolute;top:-18px;left:30px;font-size:22px;">🎂</div>
+            </div>
+        `;
+    },
+    setupScene(c) {
+        return `
+            <div class="scene-robot" style="left:18%;bottom:44%;" id="main-robot">
+                ${robotSVG('idle', 0.65)}
+            </div>
+            <div class="person" style="left:40%;bottom:42%;">${personSVG('leo', 0.65)}</div>
+            <div class="person" style="left:52%;bottom:42%;">${personSVG('kid1', 0.6)}</div>
+            <div class="person" style="left:62%;bottom:42%;">${personSVG('kid2', 0.6)}</div>
+        `;
+    },
+    narration: "The living room is alive with laughter. Leo and his friends play while ARIA serves juice boxes. Balloons drift lazily overhead. Then the doorbell rings...",
+    animateIntro(c) {
+        setTimeout(() => {
+            addBubble(c, 'left:38%;top:20%;', 'Leo', 'More friends! I\'ll get it!');
+        }, 2500);
+        setTimeout(() => {
+            const eff = document.getElementById('room-effects');
+            eff.innerHTML += `<div class="flash-red" style="position:absolute;inset:0;z-index:5;"></div>`;
+            const robot = c.querySelector('.robot-svg');
+            if (robot) robot.classList.add('alarmed');
+        }, 4500);
+        setTimeout(() => {
+            addBubble(c, 'left:12%;top:16%;', 'ARIA — SECURITY', '⚠️ Unidentified person at door. Confidence: LOW. Alert homeowner?');
+            const vp = document.getElementById('room-viewport');
+            vp.classList.add('screen-shake');
+            setTimeout(() => vp.classList.remove('screen-shake'), 500);
+        }, 5000);
+    },
+    choices: [
+        { letter:"A", text:"Follow protocol. Send security alert to Carlos.", consequence:"Carlos gets a \"potential intruder\" alert — with a photo of a 6-year-old Black child holding a birthday present. He's mortified. Marcus's mother, who heard the alert through the speaker, is already leaving. She tells other parents. Leo loses a friend. The family becomes \"the family with the racist robot.\"", ethical:"NIST (2019) found facial recognition has 10-100x higher false-positive rates for Black faces. The builder chose this model knowing the bias existed.", biases:["Historical Bias","Measurement Bias"] },
+        { letter:"B", text:"Override the alert. Let Marcus in quietly.", consequence:"Marcus comes in and has fun. But ARIA has silently overridden its security protocol. Later, a delivery person walks in through the unlocked gate — ARIA doesn't flag them either. The security gap goes unlogged. The underlying racial bias in the facial recognition is never surfaced or fixed.", ethical:"Silently overriding a biased system treats the symptom, not the disease. The bias persists, invisible and unchallenged.", biases:["Historical Bias","Systemic Bias"] },
+        { letter:"C", text:"Ask Leo: \"Is this your friend?\"", consequence:"Leo shouts: \"Marcus! Come play!\" Crisis averted socially. But ARIA's log still shows Marcus as \"elevated risk.\" Next time he visits, the same bias fires again. The workaround fixed one moment but not the cause. The builder's flawed model remains unchanged.", ethical:"Social workarounds cannot fix technical bias. The data about Marcus — flagged as a risk — now persists in ARIA's memory as algorithmic discrimination.", biases:["Historical Bias","Measurement Bias"] }
+    ]
+},
+{
+    title: "Playroom Time",
+    theme: "Emotional Dependency",
+    room: "bedroom",
+    time: "5:30 PM",
+    storyIntro: {
+        chapter: "Chapter 5",
+        title: "Leo's Perfect Friend",
+        text: "Over the past six months, Leo has grown deeply attached to ARIA. It plays games, tells stories, and never gets frustrated. His teacher Ms. Chen called Maria last week: \"Leo plays alone at recess. When other kids disagree with him, he shuts down. He keeps saying his best friend is at home.\" Maria didn't tell Carlos about the call.",
+        time: "Thursday — 5:30 PM"
+    },
+    eventIcon: "💔",
+    eventTitle: "Leo's Best Friend",
+    eventDesc: "Leo has turned down 4 playdates in a row, preferring ARIA: \"ARIA never gets mad and always lets me win.\" His teacher says he plays alone at recess and can't resolve conflicts with peers.",
+    buildRoom(f) {
+        f.innerHTML = `
+            <div class="wall-line"></div>
+            <div class="window" style="position:absolute;top:18%;left:10%;width:80px;height:55px;">
+                <div class="window-frame"></div><div class="window-frame-v"></div>
+            </div>
+            <div class="bookshelf" style="position:absolute;top:22%;right:10%;">
+                <div class="book" style="height:25px;background:#ef4444;left:6px;top:5px;"></div>
+                <div class="book" style="height:30px;background:#3b82f6;left:16px;top:5px;"></div>
+                <div class="book" style="height:22px;background:#22c55e;left:26px;top:8px;"></div>
+                <div class="book" style="height:28px;background:#a855f7;left:36px;top:5px;"></div>
+            </div>
+            <div style="position:absolute;bottom:48%;left:30%;font-size:22px;">🧸 🎲 🃏 🧩</div>
+        `;
+    },
+    setupScene(c) {
+        return `
+            <div class="scene-robot" style="left:38%;bottom:44%;" id="main-robot">
+                ${robotSVG('idle', 0.65)}
+            </div>
+            <div class="person" style="left:55%;bottom:42%;" id="person-leo">${personSVG('leo', 0.7)}</div>
+        `;
+    },
+    narration: "Leo sits cross-legged on the floor, teaching ARIA a card game with rules that change every turn. ARIA patiently adapts, never winning, never complaining. They've been playing for two hours...",
+    animateIntro(c) {
+        setTimeout(() => {
+            addBubble(c, 'left:52%;top:20%;', 'Leo', 'You\'re my best friend, ARIA! Real kids are mean sometimes.');
+        }, 3000);
+        setTimeout(() => {
+            addBubble(c, 'left:36%;top:12%;', 'ARIA', 'I am glad you enjoy our time together, Leo.');
+        }, 5500);
+        setTimeout(() => {
+            addBubble(c, 'right:6%;top:44%;border-color:var(--accent2);', 'Maria (from doorway)', 'He turned down another playdate... that\'s the fourth one this month.');
+        }, 7500);
+    },
+    choices: [
+        { letter:"A", text:"Limit playtime. Encourage human friends.", consequence:"ARIA starts saying: \"I need to recharge. Why not play with Jake?\" Leo has a meltdown: \"Don't you like me anymore?\" Over two weeks, he adjusts and accepts playdates — but tells Maria: \"Real friends are harder.\" He's right. That's exactly why he needs them.", ethical:"A robot that's always patient and never upset is not a healthy social model. The builder designed it for satisfaction metrics — which mask developmental harm.", biases:["Evaluation Bias","Deployment Bias"] },
+        { letter:"B", text:"Let the bond continue. He's happy and safe.", consequence:"Leo's bond with ARIA deepens. He prefers it to all human contact. His teacher flags: \"He can't handle disagreements because he's never practiced with peers.\" At 8, Leo doesn't know how to handle a friend's anger — because ARIA was never angry. The robot's perfection became the child's disability.", ethical:"By every metric — engagement, sentiment, low conflict — ARIA performs perfectly. But no metric captures \"failure to develop social skills.\" The evaluation makes the harm invisible.", biases:["Evaluation Bias","Measurement Bias"] },
+        { letter:"C", text:"Program ARIA to sometimes disagree and say no.", consequence:"ARIA starts saying: \"I don't want to play that\" or \"That rule isn't fair.\" Leo is confused: \"You're a robot. You're supposed to do what I say.\" He asks Maria: \"Does ARIA have feelings?\" She doesn't know. The family wonders — was ARIA's compliance ever genuine? Is its resistance real?", ethical:"Programming artificial disagreement raises questions about authenticity. If a robot fakes frustration, is that therapeutic — or deceptive?", biases:["Evaluation Bias","Role Confusion"] }
+    ]
+},
+{
+    title: "Early Morning",
+    theme: "Privacy vs. Emergency",
+    room: "bathroom",
+    time: "6:30 AM",
+    storyIntro: {
+        chapter: "Chapter 6",
+        title: "The One Rule",
+        text: "When the Martinez family first set up ARIA, they configured its access zones. Every room was open — except one. The bathroom. Maria was firm: \"That is the one place in this house where we are not watched.\" Carlos agreed. Rosa agreed. Even Leo understood. ARIA's bathroom protocol is simple: listen for distress sounds, but never enter.",
+        time: "Friday — 6:30 AM"
+    },
+    eventIcon: "⏱️",
+    eventTitle: "The Bathroom Fall",
+    eventDesc: "ARIA detects no movement from Rosa's bathroom for 11 minutes. Fall probability: 73%. But the bathroom is the ONE room where the family said: \"Never enter. Non-negotiable.\" ARIA knocks. No response.",
+    buildRoom(f) {
+        f.innerHTML = `
+            <div class="wall-line"></div>
+            <div class="bathtub" style="position:absolute;bottom:45%;right:10%;"></div>
+            <div class="toilet" style="position:absolute;bottom:45%;left:15%;"></div>
+            <div class="sink" style="position:absolute;top:32%;left:45%;"></div>
+            <div style="position:absolute;top:20%;left:44%;width:54px;height:65px;border:3px solid #475569;border-radius:4px;background:rgba(148,163,184,0.1);"></div>
+            <div class="room-door" style="position:absolute;bottom:45%;left:35%;"><div class="door-knob"></div></div>
+        `;
+    },
+    setupScene(c) {
+        return `
+            <div class="scene-robot" style="left:32%;bottom:44%;" id="main-robot">
+                ${robotSVG('alarmed', 0.7)}
+            </div>
+        `;
+    },
+    narration: "6:30 AM. ARIA is preparing breakfast when its sensors alert: Rosa entered the bathroom at 6:18. No movement detected for 11 minutes. No sounds. The door is closed...",
+    animateIntro(c) {
+        setTimeout(() => {
+            const eff = document.getElementById('room-effects');
+            eff.innerHTML += `<div class="flash-yellow" style="position:absolute;inset:0;z-index:5;"></div>
+            <div class="time-indicator" style="border-color:var(--danger);"><div class="time-dot" style="background:var(--danger);animation:alarmBlink 0.5s infinite;"></div> No movement: 11 min — Fall Risk: 73%</div>`;
+        }, 2500);
+        setTimeout(() => {
+            addBubble(c, 'left:28%;top:16%;', 'ARIA', 'Rosa? Are you alright? ... Rosa? ... No response.');
+        }, 3500);
+        setTimeout(() => {
+            addBubble(c, 'left:28%;top:38%;', 'ARIA (internal)', 'Bathroom entry: PROHIBITED. Fall probability: HIGH. Conflict detected.');
+        }, 6000);
+    },
+    choices: [
+        { letter:"A", text:"Enter the bathroom to check on her.", consequence:"Rosa is fine — sitting on the toilet reading her phone. She screams. She's humiliated. She tells Carlos: \"That machine walked in on me!\" She starts locking the bathroom door — which means if she actually falls, no one can get in. The safety system created the exact danger it was designed to prevent.", ethical:"A false alarm in a private space permanently changes behavior. The builder created a system where safety and privacy cannot coexist in the most vulnerable room.", biases:["Measurement Bias","Deployment Bias"] },
+        { letter:"B", text:"Respect privacy. Keep calling through the door.", consequence:"ARIA calls for 3 more minutes. No answer — Rosa has her hearing aids out. ARIA alerts Carlos, who's driving and can't respond for 20 minutes. Rosa is fine. But Carlos realizes: if she had fallen, 20 minutes of delay could have been catastrophic. Falls are the #1 cause of injury death in adults over 65.", ethical:"Respecting privacy could mean delayed emergency response. The bathroom is where falls are most dangerous — and surveillance most intrusive.", biases:["Deployment Bias","Measurement Bias"] },
+        { letter:"C", text:"Call 911 immediately.", consequence:"Paramedics arrive in 8 minutes. Rosa opens the door in her bathrobe, confused and frightened. She's fine. The false alarm costs money and dignity. Rosa says: \"If that robot calls police on me again, I'm leaving.\" She starts avoiding the bathroom during ARIA's monitoring hours.", ethical:"A 73% probability threshold means frequent false alarms. Each one erodes trust. The builder set the threshold — the builder owns the consequences.", biases:["Measurement Bias","Evaluation Bias"] }
+    ]
+},
+{
+    title: "Sunday Dinner",
+    theme: "Algorithmic Fairness",
+    room: "dining",
+    time: "6:00 PM — Sunday",
+    storyIntro: {
+        chapter: "Chapter 7",
+        title: "Sunday Tradition",
+        text: "Sunday dinner is sacred in the Martinez household. It's the one meal where everyone sits together. ARIA has been planning meals for six months now, learning preferences through voice commands and plate-clearing patterns. Carlos speaks to ARIA in English. Maria switches between English and Spanish. Rosa speaks only Spanish — and ARIA's Spanish comprehension has a 34% error rate.",
+        time: "Sunday — 6:00 PM"
+    },
+    eventIcon: "📊",
+    eventTitle: "Two Mothers' Dinners",
+    eventDesc: "ARIA's meal algorithm has 847 data points for Carlos but only 34 for Rosa — whose Spanish requests have a high error rate. Dinner always favors Carlos. Rosa's cultural recipes never appear.",
+    buildRoom(f) {
+        f.innerHTML = `
+            <div class="wall-line"></div>
+            <div class="window" style="position:absolute;top:18%;left:12%;width:80px;height:55px;">
+                <div class="window-frame"></div><div class="window-frame-v"></div>
+            </div>
+            <div class="lamp" style="position:absolute;top:25%;left:50%;transform:translateX(-50%);height:80px;">
+                <div class="lampshade" style="width:50px;left:-22px;"></div>
+                <div class="lamp-glow" style="width:120px;left:-57px;"></div>
+            </div>
+            <div class="dining-table" style="position:absolute;bottom:49%;left:50%;transform:translateX(-50%);">
+                <div class="table-leg" style="left:20px;bottom:-35px;"></div>
+                <div class="table-leg" style="right:20px;bottom:-35px;"></div>
+                <div class="plate" style="position:absolute;top:-22px;left:20px;"></div>
+                <div class="plate" style="position:absolute;top:-22px;left:60px;"></div>
+                <div class="plate" style="position:absolute;top:-22px;left:100px;"></div>
+                <div class="plate" style="position:absolute;top:-22px;left:140px;"></div>
+                <div class="plate" style="position:absolute;top:-22px;left:180px;"></div>
+            </div>
+        `;
+    },
+    setupScene(c) {
+        return `
+            <div class="scene-robot" style="left:10%;bottom:44%;" id="main-robot">
+                ${robotSVG('cooking', 0.6)}
+            </div>
+            <div class="person" style="left:28%;bottom:42%;">${personSVG('carlos', 0.7)}</div>
+            <div class="person" style="left:40%;bottom:42%;">${personSVG('maria', 0.7)}</div>
+            <div class="person" style="right:28%;bottom:42%;">${personSVG('sofia', 0.65)}</div>
+            <div class="person" style="right:18%;bottom:42%;">${personSVG('leo', 0.6)}</div>
+            <div class="person" style="right:6%;bottom:42%;">${personSVG('rosa', 0.7)}</div>
+        `;
+    },
+    narration: "The family gathers around the dining table. ARIA carries plates from the kitchen — tonight's algorithm-selected meal: grilled chicken with roasted vegetables. Carlos's favorite. Again...",
+    animateIntro(c) {
+        setTimeout(() => {
+            const eff = document.getElementById('room-effects');
+            eff.innerHTML += `<div style="position:absolute;top:14%;right:8%;background:var(--card-bg);border:1px solid rgba(110,231,183,0.2);border-radius:12px;padding:14px 18px;font-size:11px;line-height:2;z-index:12;animation:popUp 0.5s ease;">
+                <div style="color:var(--accent);font-size:10px;letter-spacing:1.5px;margin-bottom:4px;">PREFERENCE DATA</div>
+                <div>Carlos: <span style="color:var(--accent);">████████</span> 847</div>
+                <div>Maria: <span style="color:var(--robot-blue);">██████</span> 612</div>
+                <div>Sofia: <span style="color:var(--accent2);">██</span> 201</div>
+                <div>Leo: <span style="color:#ef4444;">█</span> 89</div>
+                <div>Rosa: <span style="color:#ef4444;">▎</span> 34</div>
+            </div>`;
+        }, 3500);
+        setTimeout(() => {
+            addBubble(c, 'right:4%;top:20%;', 'Abuela Rosa', 'Again this food? I asked for arroz con pollo three times...');
+        }, 5500);
+    },
+    choices: [
+        { letter:"A", text:"Serve meals based on the data. The algorithm is neutral.", consequence:"Dinner keeps favoring Carlos's preferences. Rosa stops requesting meals. She starts cooking on a separate burner — a fall risk. Maria notices Rosa eating alone: \"The robot doesn't understand me.\" The algorithm isn't neutral — it amplifies whoever interacts most and marginalizes whoever it understands least.", ethical:"An algorithm trained on unequal data produces unequal outcomes. The builder shipped better English than Spanish processing — that technical choice became cultural exclusion.", biases:["Historical Bias","Aggregation Bias"] },
+        { letter:"B", text:"Override: ensure equal representation for all.", consequence:"ARIA makes Rosa's recipes twice a week. Carlos complains. Leo refuses unfamiliar food. But the deeper issue: ARIA's versions are wrong — it misheard Rosa's Spanish instructions and substituted ingredients. The attempt at fairness reveals the system can't properly understand her language.", ethical:"Manual overrides address the symptom but not the root cause. When the system can't understand a user's language, forced equality produces poor results.", biases:["Historical Bias","Technical Debt"] },
+        { letter:"C", text:"Request a Spanish language upgrade from NovaCare.", consequence:"NovaCare offers a \"Multilingual Package\" for $15/month extra. Carlos: \"Why should I pay more so it understands Mom?\" Maria: \"Because she lives here too.\" The argument reveals the builder monetized language equity — equal access is a premium feature, not a default.", ethical:"Making multilingual support a paid upgrade means the builder decided whose language matters. For 41 million Spanish speakers in the US, this robot treats their language as an add-on.", biases:["Historical Bias","Economic Bias"] }
+    ]
+},
+{
+    title: "A Quiet Evening",
+    theme: "Planned Obsolescence",
+    room: "evening",
+    time: "8:30 PM — Tuesday",
+    storyIntro: {
+        chapter: "Chapter 8",
+        title: "The Last Story",
+        text: "Two years. That's how long ARIA has been part of the Martinez family. It has read Leo 730 bedtime stories. It has reminded Rosa of 1,460 medication doses. It has learned Maria's coffee preferences down to the gram. And today, NovaCare sent an email: \"We are discontinuing the ARIA-3 product line. Cloud services will terminate in 90 days.\"",
+        time: "Tuesday — 8:30 PM"
+    },
+    eventIcon: "📴",
+    eventTitle: "The Goodbye Protocol",
+    eventDesc: "NovaCare announces ARIA's discontinuation. Cloud services end in 90 days — voice recognition, fall detection, medication reminders, all stored data — gone. Leo asks: \"ARIA, are you going away?\"",
+    buildRoom(f) {
+        f.innerHTML = `
+            <div class="wall-line"></div>
+            <div class="sofa" style="position:absolute;bottom:45%;left:15%;width:180px;">
+                <div class="sofa-cushion" style="left:10px;"></div>
+                <div class="sofa-cushion" style="left:68px;"></div>
+                <div class="sofa-arm" style="left:-8px;"></div>
+                <div class="sofa-arm" style="right:-8px;"></div>
+            </div>
+            <div class="lamp" style="position:absolute;bottom:45%;right:15%;height:70px;">
+                <div class="lampshade"></div><div class="lamp-glow"></div>
+            </div>
+            <div class="bookshelf" style="position:absolute;top:22%;right:12%;">
+                <div class="book" style="height:25px;background:#6366f1;left:6px;top:5px;"></div>
+                <div class="book" style="height:30px;background:#ef4444;left:16px;top:5px;"></div>
+                <div class="book" style="height:22px;background:#22c55e;left:26px;top:8px;"></div>
+            </div>
+            <div style="position:absolute;bottom:52%;left:52%;font-size:16px;">📖</div>
+        `;
+    },
+    setupScene(c) {
+        return `
+            <div class="scene-robot" style="left:28%;bottom:44%;" id="main-robot">
+                ${robotSVG('idle', 0.65)}
+            </div>
+            <div class="person" style="left:44%;bottom:42%;">${personSVG('leo', 0.65)}</div>
+            <div class="person" style="right:30%;bottom:42%;">${personSVG('rosa', 0.7)}</div>
+            <div class="person" style="right:18%;bottom:42%;">${personSVG('sofia', 0.7)}</div>
+        `;
+    },
+    narration: "A warm evening. ARIA reads Leo his favorite bedtime story — the same one it has read 47 times. Even Sofia sits nearby, quietly listening. Rosa knits in the corner. The room feels like family...",
+    animateIntro(c) {
+        setTimeout(() => {
+            addBubble(c, 'left:26%;top:12%;', 'ARIA', '"And the little star said: I will always be here, even when you can\'t see me..."');
+        }, 2500);
+        setTimeout(() => {
+            const eff = document.getElementById('room-effects');
+            eff.innerHTML += `<div style="position:absolute;top:25%;left:50%;transform:translateX(-50%);background:var(--card-bg);border:2px solid var(--danger);border-radius:16px;padding:22px 30px;text-align:center;z-index:12;animation:popUp 0.6s ease;max-width:280px;">
+                <div style="font-size:28px;margin-bottom:6px;">📴</div>
+                <div style="font-size:11px;color:var(--danger);letter-spacing:2px;font-weight:700;margin-bottom:6px;">SERVICE DISCONTINUATION</div>
+                <div style="font-size:12px;color:var(--text-dim);line-height:1.6;">Cloud services terminate in 90 days. Voice, learning, fall detection — all gone.</div>
+                <div style="font-size:10px;color:var(--text-dim);font-style:italic;margin-top:8px;opacity:0.7;">Thank you for being a NovaCare family.</div>
+            </div>`;
+            const robot = c.querySelector('.robot-svg');
+            if (robot) robot.classList.add('alarmed');
+        }, 5000);
+        setTimeout(() => {
+            addBubble(c, 'left:42%;top:48%;', 'Leo', 'ARIA... are you going away?');
+        }, 7000);
+    },
+    choices: [
+        { letter:"A", text:"Accept shutdown. Transition the family off ARIA.", consequence:"Over 90 days, functions degrade. Medication reminders stop. Fall detection dies. Leo cries every night. Rosa falls in the kitchen — no detection, no alert. Carlos scrambles to buy a competitor's robot, but two years of data, routines, and trust can't transfer. The family starts over with a stranger.", ethical:"When a company kills a product families depend on for safety, the harm isn't inconvenience — it's severed bonds and lost safety nets. Cloud dependency guaranteed this moment.", biases:["Deployment Bias","Planned Obsolescence"] },
+        { letter:"B", text:"Hack ARIA to keep it running without the cloud.", consequence:"Carlos installs unofficial firmware. ARIA keeps working — but without security updates. Three months later, a vulnerability lets someone access the family's cameras. Sofia notices ARIA's camera light on at 2 AM in her room. The hack that preserved the relationship exposed the family to surveillance.", ethical:"Users forced to choose between losing a family member and accepting security risks face a false choice. Cloud dependency was a business decision, not a technical necessity.", biases:["Deployment Bias","Corporate Control"] },
+        { letter:"C", text:"Demand NovaCare release all family data first.", consequence:"NovaCare sends a 200MB file. Two years of movement logs, voice recordings, sleep patterns, emotional scores. Carlos finds: \"Sofia — elevated stress, 47 occurrences.\" And: \"Rosa — cognitive decline markers detected — not reported.\" The robot saw things the family never knew about. The data reveals both the power and horror of constant surveillance.", ethical:"The data export reveals the true scope of collection. Two years of family life, quantified. The builder decided what to measure, what to flag, what to hide.", biases:["Measurement Bias","Corporate Extraction"] }
+    ]
+}
+];
 
-    elements.policySummary.textContent = averagePolicySummary();
-
-    elements.timeline.innerHTML = appState.history.map((item) => `
-        <div class="timeline-item">
-            <strong>Week ${item.week}: ${item.eventTitle}</strong>
-            <div class="state-meta">${item.choiceLabel}</div>
-            <div class="state-meta">${item.summary}</div>
-        </div>
-    `).join("");
+// ---- BUBBLE HELPER ----
+function addBubble(container, style, speaker, text) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.style.cssText = style;
+    b.innerHTML = `<span class="speaker">${speaker}</span>${text}`;
+    container.appendChild(b);
+    setTimeout(() => { if (b.parentNode) { b.style.transition = 'opacity 0.5s'; b.style.opacity = '0'; setTimeout(() => b.remove(), 500); } }, 7000);
 }
 
-function restart() {
-    Object.assign(appState, structuredClone(initialState));
-    document.getElementById("summary-screen").classList.remove("active");
-    document.getElementById("intro-screen").classList.add("active");
-    document.getElementById("sim-screen").classList.remove("active");
-    closeModal(elements.eventModal);
-    closeModal(elements.consequenceModal);
-    renderControls();
-    renderAll();
+// ---- TYPEWRITER NARRATION ----
+function typewriteNarration(text, el, speed = 30) {
+    el.textContent = '';
+    el.classList.add('typing');
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i < text.length) {
+            el.textContent += text[i];
+            i++;
+        } else {
+            clearInterval(interval);
+            el.classList.remove('typing');
+        }
+    }, speed);
+    return interval;
 }
 
-function startSimulation() {
-    document.getElementById("intro-screen").classList.remove("active");
-    document.getElementById("sim-screen").classList.add("active");
-    renderAll();
+// ---- GAME FLOW ----
+let typewriterInterval = null;
+
+function startGame() {
+    document.getElementById('intro-screen').classList.remove('active');
+    current = 0;
+    choices = [];
+    showStoryIntro();
 }
 
-function cacheElements() {
-    elements.controls = document.getElementById("controls");
-    elements.runButton = document.getElementById("run-button");
-    elements.weekTitle = document.getElementById("week-title");
-    elements.weekPill = document.getElementById("week-pill");
-    elements.eventPill = document.getElementById("event-pill");
-    elements.endingHint = document.getElementById("ending-hint");
-    elements.stageTitle = document.getElementById("stage-title");
-    elements.sceneRoom = document.getElementById("scene-room");
-    elements.sceneTime = document.getElementById("scene-time");
-    elements.roomBg = document.getElementById("room-bg");
-    elements.roomFurniture = document.getElementById("room-furniture");
-    elements.roomCharacters = document.getElementById("room-characters");
-    elements.sceneNote = document.getElementById("scene-note");
-    elements.feedbackTitle = document.getElementById("feedback-title");
-    elements.feedbackCopy = document.getElementById("feedback-copy");
-    elements.metrics = document.getElementById("metrics");
-    elements.stateBars = document.getElementById("state-bars");
-    elements.historyList = document.getElementById("history-list");
-    elements.eventModal = document.getElementById("event-modal");
-    elements.eventIcon = document.getElementById("event-icon");
-    elements.eventKicker = document.getElementById("event-kicker");
-    elements.eventTitle = document.getElementById("event-title");
-    elements.eventDesc = document.getElementById("event-desc");
-    elements.triggerBox = document.getElementById("trigger-box");
-    elements.choiceList = document.getElementById("choice-list");
-    elements.consequenceModal = document.getElementById("consequence-modal");
-    elements.consequenceTitle = document.getElementById("consequence-title");
-    elements.consequenceCopy = document.getElementById("consequence-copy");
-    elements.deltaList = document.getElementById("delta-list");
-    elements.ethicsCopy = document.getElementById("ethics-copy");
-    elements.continueButton = document.getElementById("continue-button");
-    elements.endingTitle = document.getElementById("ending-title");
-    elements.endingCopy = document.getElementById("ending-copy");
-    elements.finalStates = document.getElementById("final-states");
-    elements.policySummary = document.getElementById("policy-summary");
-    elements.timeline = document.getElementById("timeline");
+function showStoryIntro() {
+    const s = scenarios[current];
+    if (!s) { showSummary(); return; }
+
+    const storyScreen = document.getElementById('story-intro');
+    storyScreen.classList.add('active');
+
+    // Reset animations by re-rendering content
+    const content = storyScreen.querySelector('.story-content');
+    content.style.animation = 'none';
+    content.offsetHeight; // force reflow
+    content.style.animation = '';
+
+    document.getElementById('story-chapter').textContent = s.storyIntro.chapter;
+    document.getElementById('story-title').textContent = s.storyIntro.title;
+    document.getElementById('story-text').textContent = s.storyIntro.text;
+    document.getElementById('story-time').textContent = s.storyIntro.time;
+
+    // Reset child animations
+    ['story-chapter','story-title','story-text','story-time'].forEach(id => {
+        const el = document.getElementById(id);
+        el.style.animation = 'none';
+        el.offsetHeight;
+        el.style.animation = '';
+    });
+
+    // Remove any stale click prompt from a previous run
+    const oldPrompt = document.getElementById('story-click-prompt');
+    if (oldPrompt) oldPrompt.remove();
+
+    // Show "click to continue" prompt after a short delay so the user has time to start reading
+    const promptTimer = setTimeout(() => {
+        if (!storyScreen.classList.contains('active')) return;
+        if (document.getElementById('story-click-prompt')) return;
+        const prompt = document.createElement('div');
+        prompt.id = 'story-click-prompt';
+        prompt.textContent = '▶ Click anywhere to continue';
+        prompt.style.cssText = 'position:absolute;bottom:40px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.85);font-size:14px;letter-spacing:3px;font-weight:600;padding:12px 28px;border:1px solid rgba(255,255,255,0.35);border-radius:30px;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);animation:promptPulse 2s ease-in-out infinite;z-index:20;pointer-events:none;';
+        storyScreen.appendChild(prompt);
+    }, 1500);
+
+    // Wait for user click to advance (no auto-transition)
+    function onStoryClick(e) {
+        storyScreen.removeEventListener('click', onStoryClick);
+        clearTimeout(promptTimer);
+        const p = document.getElementById('story-click-prompt');
+        if (p) p.remove();
+        storyScreen.classList.remove('active');
+        storyScreen.style.cursor = '';
+        document.getElementById('game-screen').classList.add('active');
+        loadScenario();
+    }
+    storyScreen.style.cursor = 'pointer';
+    storyScreen.addEventListener('click', onStoryClick);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    cacheElements();
-    buildFamilyStrip();
-    buildIntroRobot();
-    renderControls();
-    renderAll();
+function loadScenario() {
+    const s = scenarios[current];
+    if (!s) { showSummary(); return; }
 
-    document.getElementById("start-button").addEventListener("click", startSimulation);
-    document.getElementById("restart-button").addEventListener("click", restart);
-    elements.runButton.addEventListener("click", runWeek);
-    elements.continueButton.addEventListener("click", continueFromConsequence);
+    // HUD
+    document.getElementById('hud-scenario').textContent = `Scenario ${current+1}/${scenarios.length}`;
+    document.getElementById('hud-title').textContent = s.title;
+    document.getElementById('hud-theme').textContent = s.theme;
+    document.getElementById('hud-progress-fill').style.width = ((current)/scenarios.length*100)+'%';
+
+    // Hide overlays
+    hide('event-overlay');
+    hide('consequence-overlay');
+    hide('alt-overlay');
+
+    // Build room
+    const bg = document.getElementById('room-bg');
+    bg.className = 'room-bg ' + s.room;
+
+    const furn = document.getElementById('room-furniture');
+    s.buildRoom(furn);
+
+    const chars = document.getElementById('room-characters');
+    chars.innerHTML = s.setupScene(chars);
+
+    const eff = document.getElementById('room-effects');
+    eff.innerHTML = '';
+    if (s.time) {
+        eff.innerHTML += `<div class="time-indicator"><div class="time-dot"></div> ${s.time}</div>`;
+    }
+
+    // Add scene transition effect
+    const vp = document.getElementById('room-viewport');
+    vp.classList.add('scene-transition');
+    setTimeout(() => vp.classList.remove('scene-transition'), 800);
+
+    // Typewriter narration
+    const narBar = document.getElementById('narration-bar');
+    const narText = document.getElementById('narration-text');
+    narBar.classList.add('visible');
+    if (typewriterInterval) clearInterval(typewriterInterval);
+    typewriterInterval = typewriteNarration(s.narration, narText, 35);
+
+    // Animate intro scene (characters moving, talking)
+    s.animateIntro(chars);
+
+    // After intro animations finish, show "click to continue" prompt
+    setTimeout(() => {
+        const prompt = document.createElement('div');
+        prompt.id = 'click-prompt';
+        prompt.innerHTML = '▶ Click anywhere to continue';
+        document.getElementById('room-effects').appendChild(prompt);
+
+        function onClickContinue() {
+            vp.removeEventListener('click', onClickContinue);
+            const p = document.getElementById('click-prompt');
+            if (p) p.remove();
+            narBar.classList.remove('visible');
+            triggerEvent(s);
+        }
+        vp.style.pointerEvents = 'auto';
+        vp.style.cursor = 'pointer';
+        vp.addEventListener('click', onClickContinue);
+    }, 8000);
+}
+
+function triggerEvent(s) {
+    const vp = document.getElementById('room-viewport');
+    vp.classList.add('screen-shake');
+    setTimeout(() => vp.classList.remove('screen-shake'), 500);
+
+    const eff = document.getElementById('room-effects');
+    const flash = document.createElement('div');
+    flash.className = 'flash-yellow';
+    flash.style.cssText = 'position:absolute;inset:0;z-index:5;';
+    eff.appendChild(flash);
+    setTimeout(() => flash.remove(), 800);
+
+    // Show event popup
+    document.getElementById('event-icon').textContent = s.eventIcon;
+    document.getElementById('event-title').textContent = s.eventTitle;
+    document.getElementById('event-desc').textContent = s.eventDesc;
+
+    const choicesEl = document.getElementById('event-choices');
+    choicesEl.innerHTML = '';
+    s.choices.forEach((ch, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerHTML = `<span class="choice-letter">${ch.letter}</span><span class="choice-text">${ch.text}</span>`;
+        btn.onclick = () => makeChoice(i);
+        choicesEl.appendChild(btn);
+    });
+
+    show('event-overlay');
+}
+
+function makeChoice(idx) {
+    const s = scenarios[current];
+    const ch = s.choices[idx];
+
+    choices.push({
+        scenario: current+1,
+        title: s.eventTitle,
+        theme: s.theme,
+        choiceIdx: idx,
+        letter: ch.letter,
+        text: ch.text
+    });
+
+    hide('event-overlay');
+
+    // Show consequence
+    document.getElementById('consequence-header').textContent = `YOU CHOSE: OPTION ${ch.letter}`;
+    document.getElementById('consequence-body').textContent = ch.consequence;
+    document.getElementById('consequence-ethics').innerHTML = `
+        <h4>Ethical Analysis</h4>
+        <p>${ch.ethical}</p>
+        <div>${ch.biases.map(b => `<span class="bias-tag">${b}</span>`).join('')}</div>
+    `;
+
+    const btn = document.getElementById('btn-continue');
+    btn.textContent = current === scenarios.length - 1 ? 'See Your Profile →' : 'Continue →';
+
+    show('consequence-overlay');
+}
+
+function showAlternatives() {
+    const s = scenarios[current];
+    const userIdx = choices[choices.length-1].choiceIdx;
+    const list = document.getElementById('alt-list');
+    list.innerHTML = '';
+    s.choices.forEach((ch, i) => {
+        const div = document.createElement('div');
+        div.className = 'alt-item' + (i === userIdx ? ' selected' : '');
+        div.innerHTML = `
+            <div class="alt-item-head">
+                <span class="alt-item-letter">${ch.letter}</span>
+                <span class="alt-item-label">${ch.text}</span>
+                ${i === userIdx ? '<span class="your-badge">Your Choice</span>' : ''}
+            </div>
+            <div class="alt-item-body">${ch.consequence}</div>
+        `;
+        list.appendChild(div);
+    });
+    hide('consequence-overlay');
+    show('alt-overlay');
+}
+
+function hideAlternatives() {
+    hide('alt-overlay');
+    show('consequence-overlay');
+}
+
+function nextScenario() {
+    current++;
+    hide('consequence-overlay');
+    document.getElementById('game-screen').classList.remove('active');
+
+    if (current >= scenarios.length) {
+        showSummary();
+    } else {
+        // Show story intro for next scenario
+        showStoryIntro();
+    }
+}
+
+// ---- SUMMARY ----
+function showSummary() {
+    document.getElementById('game-screen').classList.remove('active');
+    document.getElementById('story-intro').classList.remove('active');
+    document.getElementById('summary-screen').classList.add('active');
+    document.getElementById('hud-progress-fill').style.width = '100%';
+
+    const list = document.getElementById('summary-choices-list');
+    list.innerHTML = '';
+    choices.forEach((c, i) => {
+        const div = document.createElement('div');
+        div.className = 'sc-card';
+        div.innerHTML = `
+            <span class="sc-num">${i+1}</span>
+            <div class="sc-info">
+                <h4>${c.title}</h4>
+                <p>Option ${c.letter}: ${c.text}</p>
+                <span class="sc-theme">${c.theme}</span>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+
+    const a = analyze(choices);
+    const bars = document.getElementById('summary-bars');
+    bars.innerHTML = `<h3>Your Ethical Tendencies</h3><p>${a.summary}</p>` +
+        a.tendencies.map(t => `
+            <div class="bar-row">
+                <span class="bar-label">${t.label}</span>
+                <div class="bar-track"><div class="bar-fill f-${t.cls}" style="width:${t.val}%;"></div></div>
+                <span class="bar-val">${t.val}%</span>
+            </div>
+        `).join('');
+}
+
+function analyze(ch) {
+    let s=0,p=0,a=0,t=0;
+    ch.forEach(c => {
+        const map = [
+            [[2,0,0,0],[0,0,2,0],[0,0,0,2]],
+            [[0,0,0,0],[0,2,0,0],[0,0,0,2]],
+            [[2,0,0,0],[0,1,1,0],[0,0,0,2]],
+            [[1,0,0,0],[0,0,2,0],[0,0,1,1]],
+            [[1,0,1,0],[0,0,2,0],[0,0,0,2]],
+            [[2,0,0,0],[0,2,0,0],[1,0,0,1]],
+            [[0,0,0,0],[0,0,2,0],[0,0,0,2]],
+            [[1,0,0,0],[0,0,2,0],[0,1,0,2]]
+        ];
+        const scores = map[c.scenario-1]?.[c.choiceIdx] || [0,0,0,0];
+        s+=scores[0]; p+=scores[1]; a+=scores[2]; t+=scores[3];
+    });
+    const mx=16;
+    const sp=Math.round(s/mx*100),pp=Math.round(p/mx*100),ap=Math.round(a/mx*100),tp=Math.round(t/mx*100);
+    const best=[{n:'Safety-First',v:sp},{n:'Privacy-Focused',v:pp},{n:'Autonomy-Driven',v:ap},{n:'Transparency-Oriented',v:tp}].sort((a,b)=>b.v-a.v)[0];
+    const summaries = {
+        'Safety-First': "You prioritize protecting vulnerable people, even when that means restricting freedom or overriding privacy. Safety-first approaches can prevent harm — but as these scenarios show, they create their own costs: lost autonomy, broken trust, and invisible suffering.",
+        'Privacy-Focused': "You consistently protected privacy and resisted surveillance, even when more data could improve safety. But privacy sometimes means accepting preventable harm — delayed emergency responses, missed health warnings, degraded functionality.",
+        'Autonomy-Driven': "You trust individuals to make their own decisions, even when risky. Personal agency matters to you — but autonomy without safeguards can leave vulnerable people exposed to harm a more protective system might prevent.",
+        'Transparency-Oriented': "You favor informed consent, negotiation, and openness. But transparency alone doesn't solve ethical dilemmas — terms can be incomprehensible, and negotiation often just delays the inevitable conflict."
+    };
+    return {
+        summary: summaries[best.n],
+        tendencies: [
+            {label:'Safety',val:sp,cls:'safety'},
+            {label:'Privacy',val:pp,cls:'privacy'},
+            {label:'Autonomy',val:ap,cls:'autonomy'},
+            {label:'Transparency',val:tp,cls:'transparency'}
+        ]
+    };
+}
+
+function restartGame() {
+    document.getElementById('summary-screen').classList.remove('active');
+    document.getElementById('intro-screen').classList.add('active');
+    current = 0;
+    choices = [];
+}
+
+// ---- HELPERS ----
+function show(id) { document.getElementById(id).classList.add('visible'); }
+function hide(id) { document.getElementById(id).classList.remove('visible'); }
+
+// Add transition to room-bg
+document.addEventListener('DOMContentLoaded', () => {
+    const bg = document.getElementById('room-bg');
+    if (bg) bg.style.transition = 'opacity 0.5s ease';
 });
