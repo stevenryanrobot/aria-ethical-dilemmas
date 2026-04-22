@@ -75,6 +75,9 @@
             <h2 class="event-title" id="event-title"></h2>
             <p class="event-desc" id="event-desc"></p>
             <div class="event-choices" id="event-choices"></div>
+            <div class="consequence-buttons" style="margin-top:16px;">
+                <button class="btn-alt" onclick="backToSceneFromEvent()">← Back to Scene</button>
+            </div>
         </div>
     </div>
     <!-- CONSEQUENCE -->
@@ -84,6 +87,7 @@
             <div class="consequence-body" id="consequence-body"></div>
             <div class="consequence-ethics" id="consequence-ethics"></div>
             <div class="consequence-buttons">
+                <button class="btn-alt" onclick="backToSceneFromConsequence()">← Back to Scene</button>
                 <button class="btn-alt" onclick="changeChoice()">← Change Choice</button>
                 <button class="btn-alt" onclick="showAlternatives()">Other Choices</button>
                 <button class="btn-continue" id="btn-continue" onclick="nextScenario()">Continue →</button>

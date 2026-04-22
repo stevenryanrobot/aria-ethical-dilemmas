@@ -817,6 +817,14 @@ function goForwardToEvent() {
     triggerEvent(s);
 }
 
+function backToSceneFromEvent() {
+    hide("event-overlay");
+}
+
+function backToSceneFromConsequence() {
+    hide("consequence-overlay");
+}
+
 function showStoryIntro() {
     const s = scenarios[current];
     if (!s) {
