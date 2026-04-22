@@ -225,7 +225,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,#f5f0e7 0%
 .char-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;animation:charRise 0.85s cubic-bezier(0.22,1,0.36,1) both;animation-delay:var(--char-delay,0s);}
 .char-art{display:flex;align-items:flex-end;justify-content:center;animation:charBreathe 4s ease-in-out infinite;}
 .scene-robot .char-art{animation:robotHover 3.4s ease-in-out infinite;}
-.char-name{padding:5px 10px;border-radius:999px;background:rgba(255,253,247,0.94);border:1px solid rgba(47,127,116,0.18);box-shadow:0 10px 22px rgba(41,36,28,0.12);font-size:11px;font-weight:700;letter-spacing:0.8px;color:var(--text);text-transform:uppercase;backdrop-filter:blur(6px);}
+.char-name{position:relative;z-index:24;padding:5px 10px;border-radius:999px;background:rgba(255,253,247,0.94);border:1px solid rgba(47,127,116,0.18);box-shadow:0 10px 22px rgba(41,36,28,0.12);font-size:11px;font-weight:700;letter-spacing:0.8px;color:var(--text);text-transform:uppercase;backdrop-filter:blur(6px);}
 .scene-robot .char-name{background:rgba(47,127,116,0.12);border-color:rgba(47,127,116,0.28);color:var(--accent);}
 .guest .char-name{background:rgba(184,134,11,0.12);border-color:rgba(184,134,11,0.28);color:#8b6200;}
 @keyframes charRise{from{opacity:0;transform:translateY(22px) scale(0.96);}to{opacity:1;transform:translateY(0) scale(1);}}
@@ -235,7 +235,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,#f5f0e7 0%
 @keyframes namePulse{0%,100%{box-shadow:0 10px 22px rgba(41,36,28,0.12);}50%{box-shadow:0 12px 28px rgba(177,79,68,0.22);}}
 
 /* ---- SPEECH/THOUGHT BUBBLES ---- */
-.bubble{position:absolute;background:rgba(255,253,247,0.96);color:#1f2430;padding:10px 14px;border-radius:14px;font-size:12px;line-height:1.4;max-width:200px;box-shadow:0 8px 20px rgba(41,36,28,0.16);z-index:20;animation:bubblePop 0.4s ease;border:1px solid rgba(47,127,116,0.12);}
+.bubble{position:absolute;background:rgba(255,253,247,0.96);color:#1f2430;padding:10px 14px;border-radius:14px;font-size:12px;line-height:1.4;max-width:200px;box-shadow:0 8px 20px rgba(41,36,28,0.16);z-index:18;animation:bubblePop 0.4s ease;border:1px solid rgba(47,127,116,0.12);}
 .bubble::after{content:'';position:absolute;bottom:-6px;left:20px;width:12px;height:6px;background:rgba(255,255,255,0.95);clip-path:polygon(0 0,100% 0,50% 100%);}
 .bubble-below::after{bottom:auto;top:-6px;clip-path:polygon(50% 0,0 100%,100% 100%);}
 .bubble .speaker{display:block;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--robot-dark);margin-bottom:3px;}

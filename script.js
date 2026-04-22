@@ -36,7 +36,7 @@ function addBubbleNear(container, label, speaker, text, options = {}) {
     const {
         align = "center",
         offsetX = 0,
-        offsetY = -14
+        offsetY = -26
     } = options;
 
     const targetName = [...container.querySelectorAll(".char-name")].find(
