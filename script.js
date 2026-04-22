@@ -39,6 +39,19 @@ function addBubble(container, style, speaker, text) {
     }, 6200);
 }
 
+function moveEntity(container, selector, styles = {}, robotState = null) {
+    const el = container.querySelector(selector);
+    if (!el) return;
+    Object.entries(styles).forEach(([key, value]) => {
+        el.style[key] = value;
+    });
+    const robot = el.querySelector(".robot-svg");
+    if (robotState && robot) {
+        robot.classList.remove("idle", "cooking", "cleaning", "walking", "alarmed");
+        robot.classList.add(robotState);
+    }
+}
+
 function typewriteNarration(text, el, speed = 26) {
     el.textContent = "";
     el.classList.add("typing");
@@ -185,7 +198,7 @@ const scenarios = [
         },
         setupScene() {
             return `
-                ${namedRobot("Robot", "idle", 0.66, "left:56%;bottom:44%;", "", "0.05s")}
+                ${namedRobot("Robot", "idle", 0.66, "left:46%;bottom:44%;", "", "0.05s")}
                 ${namedPerson("maria", "Maria", 0.72, "left:25%;bottom:42%;", "", "0.14s")}
                 ${namedPerson("carlos", "Carlos", 0.72, "left:42%;bottom:42%;", "", "0.22s")}
                 ${namedPerson("elena", "Elena", 0.7, "right:16%;bottom:42%;", "guest", "0.3s")}
@@ -193,7 +206,13 @@ const scenarios = [
         },
         narration: "The robot does not just recognize Elena. It remembers something she thought stayed between two friends.",
         animateIntro(c) {
-            setTimeout(() => addBubble(c, "right:8%;top:18%;", "Robot", "Welcome back, Elena. Are you sleeping any better lately?"), 2600);
+            setTimeout(() => {
+                moveEntity(c, ".scene-robot", { left: "69%" }, "walking");
+            }, 1900);
+            setTimeout(() => {
+                moveEntity(c, ".scene-robot", {}, "idle");
+                addBubble(c, "right:10%;top:18%;", "Robot", "Welcome back, Elena. Are you sleeping any better lately?");
+            }, 3200);
             setTimeout(() => addBubble(c, "right:5%;top:34%;", "Elena", "Wait... I only told Maria that. Why does your robot know?"), 4400);
             setTimeout(() => {
                 const eff = document.getElementById("room-effects");
@@ -269,10 +288,12 @@ const scenarios = [
         animateIntro(c) {
             setTimeout(() => addBubble(c, "right:4%;top:18%;", "Rosa", "This is my house. Those are my tomatoes. Move."), 2500);
             setTimeout(() => {
-                const robot = c.querySelector(".robot-svg");
-                if (robot) robot.classList.add("alarmed");
+                moveEntity(c, ".scene-robot", { right: "18%" }, "walking");
+            }, 3400);
+            setTimeout(() => {
+                moveEntity(c, ".scene-robot", {}, "alarmed");
                 addBubble(c, "right:20%;top:18%;", "Robot", "Carlos's standing rule says you may not go outside without supervision.");
-            }, 4200);
+            }, 4300);
             setTimeout(() => {
                 const eff = document.getElementById("room-effects");
                 eff.innerHTML += `<div class="door-beam"></div>`;
@@ -327,12 +348,16 @@ const scenarios = [
             `;
         },
         setupScene() {
-            return `${namedRobot("Robot", "alarmed", 0.7, "left:28%;bottom:44%;", "pulse-alert", "0.05s")}`;
+            return `${namedRobot("Robot", "idle", 0.7, "left:18%;bottom:44%;", "pulse-alert", "0.05s")}`;
         },
         narration: "One protected room turns into the hardest ethical problem in the house the moment the system thinks something may be wrong inside it.",
         animateIntro(c) {
-            setTimeout(() => addBubble(c, "left:24%;top:16%;", "Robot", "Rosa? Are you all right? No movement detected."), 2400);
             setTimeout(() => {
+                moveEntity(c, ".scene-robot", { left: "29%" }, "walking");
+            }, 1800);
+            setTimeout(() => addBubble(c, "left:24%;top:16%;", "Robot", "Rosa? Are you all right? No movement detected."), 2900);
+            setTimeout(() => {
+                moveEntity(c, ".scene-robot", {}, "alarmed");
                 const eff = document.getElementById("room-effects");
                 eff.innerHTML += `
                     <div class="time-indicator danger"><div class="time-dot danger-dot"></div> No movement: 11 min · Fall risk: high</div>
@@ -554,8 +579,20 @@ const scenarios = [
         animateIntro(c) {
             setTimeout(() => {
                 const eff = document.getElementById("room-effects");
+                eff.innerHTML += `
+                    <div class="system-card" style="top:16%;right:8%;">
+                        <div class="system-card-label">DOOR DELIVERY</div>
+                        <div class="system-card-body">Live handoff request at front door.</div>
+                        <div class="system-card-meta">Kitchen task priority reduced.</div>
+                    </div>
+                `;
+                moveEntity(c, ".scene-robot", { left: "50%" }, "walking");
+            }, 1800);
+            setTimeout(() => {
+                const eff = document.getElementById("room-effects");
                 eff.innerHTML += `<div class="fire-plume" style="left:46%;top:45%;"></div>`;
-            }, 2400);
+                moveEntity(c, ".scene-robot", { left: "42%" }, "alarmed");
+            }, 3000);
             setTimeout(() => addBubble(c, "left:34%;top:14%;", "Robot Log", "Temperature anomaly detected. Door interaction task promoted."), 3700);
             setTimeout(() => addBubble(c, "right:6%;top:20%;", "Carlos", "So it knew something was wrong and still kept going?"), 5600);
         },
@@ -613,6 +650,7 @@ const scenarios = [
         setupScene() {
             return `
                 ${namedRobot("Robot", "alarmed", 0.68, "left:42%;bottom:44%;", "pulse-alert", "0.05s")}
+                ${namedPerson("maria", "Maria", 0.72, "left:18%;bottom:42%;", "", "0.12s")}
                 ${namedPerson("leo", "Leo", 0.72, "left:62%;bottom:42%;", "", "0.16s")}
                 ${namedPerson("rosa", "Rosa", 0.8, "right:12%;bottom:42%;", "", "0.26s")}
             `;
