@@ -91,6 +91,7 @@ function personSVG(who, scale = 1) {
     const defs = {
         carlos: { skin:'#c68642', hair:'#2c1810', hairStyle:'short', shirt:'#2563eb', pants:'#1e3a5a', shoes:'#1a1a2e', beard:true },
         maria:  { skin:'#d4a574', hair:'#3d1f0e', hairStyle:'long', shirt:'#dc2626', pants:'#4a3728', shoes:'#8b4513', earrings:true },
+        elena:  { skin:'#e2b48d', hair:'#5a3422', hairStyle:'long', shirt:'#0f766e', pants:'#5b4636', shoes:'#7c3f00', earrings:true },
         sofia:  { skin:'#d4a574', hair:'#3d1f0e', hairStyle:'ponytail', shirt:'#a855f7', pants:'#4a3728', shoes:'#ec4899', teen:true },
         leo:    { skin:'#c68642', hair:'#2c1810', hairStyle:'messy', shirt:'#22c55e', pants:'#1e3a5a', shoes:'#333', child:true },
         rosa:   { skin:'#c68642', hair:'#d4d4d4', hairStyle:'bun', shirt:'#f59e0b', pants:'#6b4226', shoes:'#8b4513', elderly:true, glasses:true },
