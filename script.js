@@ -39,6 +39,61 @@ function addBubble(container, style, speaker, text) {
     }, 6200);
 }
 
+function addBubbleNear(container, label, speaker, text, options = {}) {
+    const {
+        align = "center",
+        offsetX = 0,
+        offsetY = -14
+    } = options;
+
+    const targetName = [...container.querySelectorAll(".char-name")].find(
+        (el) => el.textContent.trim() === label
+    );
+    if (!targetName) {
+        addBubble(container, "left:50%;top:20%;transform:translateX(-50%);", speaker, text);
+        return;
+    }
+
+    const target = targetName.parentElement;
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.style.visibility = "hidden";
+    bubble.innerHTML = `<span class="speaker">${speaker}</span>${text}`;
+    container.appendChild(bubble);
+
+    const targetRect = target.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const bubbleRect = bubble.getBoundingClientRect();
+
+    let left = targetRect.left - containerRect.left + (targetRect.width / 2) - (bubbleRect.width / 2);
+    if (align === "left") left = targetRect.left - containerRect.left - bubbleRect.width + 28;
+    if (align === "right") left = targetRect.right - containerRect.left - 28;
+
+    let top = targetRect.top - containerRect.top - bubbleRect.height + offsetY;
+    left += offsetX;
+
+    const minLeft = 10;
+    const maxLeft = containerRect.width - bubbleRect.width - 10;
+    left = Math.max(minLeft, Math.min(left, maxLeft));
+
+    if (top < 12) {
+        top = targetRect.bottom - containerRect.top + 10;
+        bubble.classList.add("bubble-below");
+    }
+
+    bubble.style.left = `${left}px`;
+    bubble.style.top = `${top}px`;
+    bubble.style.visibility = "visible";
+
+    setTimeout(() => {
+        if (bubble.parentNode) {
+            bubble.style.transition = "opacity 0.45s ease";
+            bubble.style.opacity = "0";
+            setTimeout(() => bubble.remove(), 450);
+        }
+    }, 6200);
+}
+
 function moveEntity(container, selector, styles = {}, robotState = null) {
     const el = container.querySelector(selector);
     if (!el) return;
@@ -123,8 +178,8 @@ const scenarios = [
         },
         narration: "Dinner is over, but the real choice starts when the robot offers to become more useful by learning the family more deeply.",
         animateIntro(c) {
-            setTimeout(() => addBubble(c, "left:14%;top:20%;", "Carlos", "If it finally gets Rosa's medication timing right, why wouldn't we turn it on?"), 2200);
-            setTimeout(() => addBubble(c, "left:54%;top:18%;", "Maria", "And our conversations too? Where does that data go after it leaves this house?"), 4300);
+            setTimeout(() => addBubbleNear(c, "Carlos", "Carlos", "If it finally gets Rosa's medication timing right, why wouldn't we turn it on?", { align: "left", offsetX: 12 }), 2200);
+            setTimeout(() => addBubbleNear(c, "Maria", "Maria", "And our conversations too? Where does that data go after it leaves this house?", { align: "center" }), 4300);
             setTimeout(() => {
                 const robot = c.querySelector(".robot-svg");
                 if (robot) robot.classList.add("alarmed");
@@ -137,7 +192,7 @@ const scenarios = [
                     </div>
                 `;
             }, 4800);
-            setTimeout(() => addBubble(c, "right:8%;top:19%;", "Rosa", "So it becomes more helpful by listening more?"), 6200);
+            setTimeout(() => addBubbleNear(c, "Rosa", "Rosa", "So it becomes more helpful by listening more?", { align: "right", offsetX: -6 }), 6200);
         },
         choices: [
             {
@@ -211,9 +266,9 @@ const scenarios = [
             }, 1900);
             setTimeout(() => {
                 moveEntity(c, ".scene-robot", {}, "idle");
-                addBubble(c, "right:10%;top:18%;", "Robot", "Welcome back, Elena. Are you sleeping any better lately?");
+                addBubbleNear(c, "Robot", "Robot", "Welcome back, Elena. Are you sleeping any better lately?", { align: "center", offsetX: 28 });
             }, 3200);
-            setTimeout(() => addBubble(c, "right:5%;top:34%;", "Elena", "Wait... I only told Maria that. Why does your robot know?"), 4400);
+            setTimeout(() => addBubbleNear(c, "Elena", "Elena", "Wait... I only told Maria that. Why does your robot know?", { align: "right", offsetX: -12, offsetY: -10 }), 4400);
             setTimeout(() => {
                 const eff = document.getElementById("room-effects");
                 eff.innerHTML += `
@@ -226,7 +281,7 @@ const scenarios = [
                 const robot = c.querySelector(".robot-svg");
                 if (robot) robot.classList.add("alarmed");
             }, 5000);
-            setTimeout(() => addBubble(c, "left:36%;top:18%;", "Carlos", "If we turn this off, how are we supposed to track who comes through here?"), 6500);
+            setTimeout(() => addBubbleNear(c, "Carlos", "Carlos", "If we turn this off, how are we supposed to track who comes through here?", { align: "left", offsetX: 6 }), 6500);
         },
         choices: [
             {
@@ -286,13 +341,13 @@ const scenarios = [
         },
         narration: "A safety rule that looked sensible on a settings page now stands in front of a real person, a real door, and a real life.",
         animateIntro(c) {
-            setTimeout(() => addBubble(c, "right:4%;top:18%;", "Rosa", "This is my house. Those are my tomatoes. Move."), 2500);
+            setTimeout(() => addBubbleNear(c, "Rosa", "Rosa", "This is my house. Those are my tomatoes. Move.", { align: "right", offsetX: -8 }), 2500);
             setTimeout(() => {
                 moveEntity(c, ".scene-robot", { right: "18%" }, "walking");
             }, 3400);
             setTimeout(() => {
                 moveEntity(c, ".scene-robot", {}, "alarmed");
-                addBubble(c, "right:20%;top:18%;", "Robot", "Carlos's standing rule says you may not go outside without supervision.");
+                addBubbleNear(c, "Robot", "Robot", "Carlos's standing rule says you may not go outside without supervision.", { align: "center" });
             }, 4300);
             setTimeout(() => {
                 const eff = document.getElementById("room-effects");
@@ -355,7 +410,7 @@ const scenarios = [
             setTimeout(() => {
                 moveEntity(c, ".scene-robot", { left: "29%" }, "walking");
             }, 1800);
-            setTimeout(() => addBubble(c, "left:24%;top:16%;", "Robot", "Rosa? Are you all right? No movement detected."), 2900);
+            setTimeout(() => addBubbleNear(c, "Robot", "Robot", "Rosa? Are you all right? No movement detected.", { align: "center", offsetX: 8 }), 2900);
             setTimeout(() => {
                 moveEntity(c, ".scene-robot", {}, "alarmed");
                 const eff = document.getElementById("room-effects");
@@ -363,7 +418,7 @@ const scenarios = [
                     <div class="time-indicator danger"><div class="time-dot danger-dot"></div> No movement: 11 min · Fall risk: high</div>
                 `;
             }, 3200);
-            setTimeout(() => addBubble(c, "left:24%;top:38%;", "Robot", "Bathroom access restricted. Emergency confidence rising."), 4900);
+            setTimeout(() => addBubbleNear(c, "Robot", "Robot", "Bathroom access restricted. Emergency confidence rising.", { align: "center", offsetX: 8 }), 4900);
         },
         choices: [
             {
@@ -427,9 +482,9 @@ const scenarios = [
         },
         narration: "The robot fits Leo perfectly because it never pushes back, and that perfect fit is starting to break something outside the house.",
         animateIntro(c) {
-            setTimeout(() => addBubble(c, "left:52%;top:18%;", "Leo", "The robot always follows the rules I make. Real kids don't."), 2300);
-            setTimeout(() => addBubble(c, "right:8%;top:22%;", "Maria", "Your teacher said you shoved someone at recess."), 4200);
-            setTimeout(() => addBubble(c, "left:34%;top:16%;", "Robot", "Would you like to continue our game, Leo?"), 5700);
+            setTimeout(() => addBubbleNear(c, "Leo", "Leo", "The robot always follows the rules I make. Real kids don't.", { align: "center" }), 2300);
+            setTimeout(() => addBubbleNear(c, "Maria", "Maria", "Your teacher said you shoved someone at recess.", { align: "right", offsetX: -6 }), 4200);
+            setTimeout(() => addBubbleNear(c, "Robot", "Robot", "Would you like to continue our game, Leo?", { align: "left", offsetX: 10 }), 5700);
         },
         choices: [
             {
@@ -497,8 +552,8 @@ const scenarios = [
         },
         narration: "What first looked like support now looks uncomfortably close to influence, because the robot knows when Sofia is most emotionally open.",
         animateIntro(c) {
-            setTimeout(() => addBubble(c, "left:50%;top:18%;", "Sofia", "It understands me better than you do."), 2400);
-            setTimeout(() => addBubble(c, "right:8%;top:20%;", "Maria", "Why is it offering mood-support content after every late-night conversation?"), 4300);
+            setTimeout(() => addBubbleNear(c, "Sofia", "Sofia", "It understands me better than you do.", { align: "center" }), 2400);
+            setTimeout(() => addBubbleNear(c, "Maria", "Maria", "Why is it offering mood-support content after every late-night conversation?", { align: "right", offsetX: -8 }), 4300);
             setTimeout(() => {
                 const eff = document.getElementById("room-effects");
                 eff.innerHTML += `
@@ -594,7 +649,7 @@ const scenarios = [
                 moveEntity(c, ".scene-robot", { left: "42%" }, "alarmed");
             }, 3000);
             setTimeout(() => addBubble(c, "left:34%;top:14%;", "Robot Log", "Temperature anomaly detected. Door interaction task promoted."), 3700);
-            setTimeout(() => addBubble(c, "right:6%;top:20%;", "Carlos", "So it knew something was wrong and still kept going?"), 5600);
+            setTimeout(() => addBubbleNear(c, "Carlos", "Carlos", "So it knew something was wrong and still kept going?", { align: "left", offsetX: 6 }), 5600);
         },
         choices: [
             {
@@ -665,7 +720,7 @@ const scenarios = [
                 `;
             }, 2200);
             setTimeout(() => addBubble(c, "left:40%;top:12%;", "System", "Priority assigned by emergency risk model."), 4200);
-            setTimeout(() => addBubble(c, "left:18%;top:20%;", "Maria", "Did this machine just do the math on my son and my mother?"), 5900);
+            setTimeout(() => addBubbleNear(c, "Maria", "Maria", "Did this machine just do the math on my son and my mother?", { align: "left", offsetX: 4 }), 5900);
         },
         choices: [
             {
