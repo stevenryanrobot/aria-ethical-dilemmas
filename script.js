@@ -30,13 +30,6 @@ function addBubble(container, style, speaker, text) {
     b.style.cssText = style;
     b.innerHTML = `<span class="speaker">${speaker}</span>${text}`;
     container.appendChild(b);
-    setTimeout(() => {
-        if (b.parentNode) {
-            b.style.transition = "opacity 0.45s ease";
-            b.style.opacity = "0";
-            setTimeout(() => b.remove(), 450);
-        }
-    }, 6200);
 }
 
 function addBubbleNear(container, label, speaker, text, options = {}) {
@@ -84,14 +77,6 @@ function addBubbleNear(container, label, speaker, text, options = {}) {
     bubble.style.left = `${left}px`;
     bubble.style.top = `${top}px`;
     bubble.style.visibility = "visible";
-
-    setTimeout(() => {
-        if (bubble.parentNode) {
-            bubble.style.transition = "opacity 0.45s ease";
-            bubble.style.opacity = "0";
-            setTimeout(() => bubble.remove(), 450);
-        }
-    }, 6200);
 }
 
 function moveEntity(container, selector, styles = {}, robotState = null) {
