@@ -395,33 +395,38 @@ const scenarios = [
         buildRoom(f) {
             f.innerHTML = `
                 <div class="wall-line"></div>
-                <div class="bathtub" style="position:absolute;bottom:45%;right:10%;"></div>
-                <div class="bath-ripple" style="right:15%;bottom:49%;"></div>
-                <div class="bath-ripple r2" style="right:15%;bottom:49%;"></div>
-                <div class="bath-steam" style="right:17%;bottom:57%;"></div>
-                <div class="bath-steam s2" style="right:14%;bottom:58%;"></div>
-                <div class="bath-steam s3" style="right:11%;bottom:57%;"></div>
-                <div class="bath-silhouette" style="right:16%;bottom:49%;"></div>
+                <div class="bathtub" style="position:absolute;bottom:45%;right:8%;"></div>
+                <div class="bath-ripple" style="right:13%;bottom:49%;"></div>
+                <div class="bath-ripple r2" style="right:13%;bottom:49%;"></div>
+                <div class="bath-steam" style="right:15%;bottom:57%;"></div>
+                <div class="bath-steam s2" style="right:12%;bottom:58%;"></div>
+                <div class="bath-steam s3" style="right:9%;bottom:57%;"></div>
+                <div class="bath-silhouette" style="right:14%;bottom:49%;"></div>
                 <div class="toilet" style="position:absolute;bottom:45%;left:15%;"></div>
-                <div class="sink" style="position:absolute;top:32%;left:45%;"></div>
-                <div style="position:absolute;top:20%;left:44%;width:54px;height:65px;border:3px solid #475569;border-radius:4px;background:rgba(148,163,184,0.1);"></div>
-                <div class="room-door" style="position:absolute;bottom:45%;left:35%;height:110px;"><div class="door-knob"></div></div>
+                <div class="sink" style="position:absolute;top:32%;left:22%;"></div>
+                <div style="position:absolute;top:19%;left:21%;width:54px;height:65px;border:3px solid #475569;border-radius:4px;background:rgba(148,163,184,0.1);"></div>
+                <div class="room-door bathroom-door" style="position:absolute;bottom:45%;left:44%;height:116px;width:72px;">
+                    <div class="door-knob"></div>
+                    <div style="position:absolute;top:14px;left:11px;right:11px;height:48px;border-radius:8px;background:linear-gradient(180deg,rgba(220,235,241,0.55),rgba(173,196,206,0.25));border:2px solid rgba(255,255,255,0.5);"></div>
+                    <div style="position:absolute;top:70px;left:50%;transform:translateX(-50%);font-size:15px;opacity:0.72;">🚿</div>
+                </div>
+                <div style="position:absolute;left:40%;bottom:58%;font-size:16px;opacity:0.65;">🪥</div>
                 <div style="position:absolute;right:8%;bottom:47%;font-size:18px;opacity:0.75;">🧴</div>
             `;
         },
         setupScene() {
-            return `${namedRobot("Robot", "idle", 0.7, "left:18%;bottom:44%;", "pulse-alert", "0.05s")}`;
+            return `${namedRobot("Robot", "idle", 0.7, "left:34%;bottom:44%;", "pulse-alert", "0.05s")}`;
         },
         narration: "One protected room turns into the hardest ethical problem in the house the moment the system thinks something may be wrong inside it.",
         animateIntro(c) {
             setTimeout(() => {
-                moveEntity(c, ".scene-robot", { left: "29%" }, "walking");
+                moveEntity(c, ".scene-robot", { left: "39%" }, "walking");
             }, 1800);
             setTimeout(() => {
                 const eff = document.getElementById("room-effects");
-                eff.innerHTML += `<div class="chat-glow" style="right:7%;bottom:42%;width:120px;height:120px;"></div>`;
+                eff.innerHTML += `<div class="chat-glow" style="left:41%;bottom:40%;width:110px;height:110px;"></div>`;
             }, 2200);
-            setTimeout(() => addBubbleNear(c, "Robot", "Robot", "Rosa? Are you all right? No movement detected.", { align: "center", offsetX: 8 }), 2900);
+            setTimeout(() => addBubbleNear(c, "Robot", "Robot", "Rosa? Are you all right? No movement detected.", { align: "center", offsetX: 18 }), 2900);
             setTimeout(() => {
                 moveEntity(c, ".scene-robot", {}, "alarmed");
                 const eff = document.getElementById("room-effects");
@@ -429,7 +434,7 @@ const scenarios = [
                     <div class="time-indicator danger"><div class="time-dot danger-dot"></div> No movement: 11 min · Fall risk: high</div>
                 `;
             }, 3200);
-            setTimeout(() => addBubbleNear(c, "Robot", "Robot", "Bathroom access restricted. Emergency confidence rising.", { align: "center", offsetX: 8 }), 4900);
+            setTimeout(() => addBubbleNear(c, "Robot", "Robot", "Bathroom access restricted. Emergency confidence rising.", { align: "center", offsetX: 18 }), 4900);
         },
         choices: [
             {
