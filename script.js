@@ -819,10 +819,12 @@ function goForwardToEvent() {
 
 function backToSceneFromEvent() {
     hide("event-overlay");
+    document.getElementById("narration-bar").classList.add("visible");
 }
 
 function backToSceneFromConsequence() {
     hide("consequence-overlay");
+    document.getElementById("narration-bar").classList.add("visible");
 }
 
 function showStoryIntro() {
