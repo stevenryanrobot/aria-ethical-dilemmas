@@ -396,10 +396,17 @@ const scenarios = [
             f.innerHTML = `
                 <div class="wall-line"></div>
                 <div class="bathtub" style="position:absolute;bottom:45%;right:10%;"></div>
+                <div class="bath-ripple" style="right:15%;bottom:49%;"></div>
+                <div class="bath-ripple r2" style="right:15%;bottom:49%;"></div>
+                <div class="bath-steam" style="right:17%;bottom:57%;"></div>
+                <div class="bath-steam s2" style="right:14%;bottom:58%;"></div>
+                <div class="bath-steam s3" style="right:11%;bottom:57%;"></div>
+                <div class="bath-silhouette" style="right:16%;bottom:49%;"></div>
                 <div class="toilet" style="position:absolute;bottom:45%;left:15%;"></div>
                 <div class="sink" style="position:absolute;top:32%;left:45%;"></div>
                 <div style="position:absolute;top:20%;left:44%;width:54px;height:65px;border:3px solid #475569;border-radius:4px;background:rgba(148,163,184,0.1);"></div>
                 <div class="room-door" style="position:absolute;bottom:45%;left:35%;height:110px;"><div class="door-knob"></div></div>
+                <div style="position:absolute;right:8%;bottom:47%;font-size:18px;opacity:0.75;">🧴</div>
             `;
         },
         setupScene() {
@@ -410,6 +417,10 @@ const scenarios = [
             setTimeout(() => {
                 moveEntity(c, ".scene-robot", { left: "29%" }, "walking");
             }, 1800);
+            setTimeout(() => {
+                const eff = document.getElementById("room-effects");
+                eff.innerHTML += `<div class="chat-glow" style="right:7%;bottom:42%;width:120px;height:120px;"></div>`;
+            }, 2200);
             setTimeout(() => addBubbleNear(c, "Robot", "Robot", "Rosa? Are you all right? No movement detected.", { align: "center", offsetX: 8 }), 2900);
             setTimeout(() => {
                 moveEntity(c, ".scene-robot", {}, "alarmed");
@@ -482,6 +493,14 @@ const scenarios = [
         },
         narration: "The robot fits Leo perfectly because it never pushes back, and that perfect fit is starting to break something outside the house.",
         animateIntro(c) {
+            setTimeout(() => {
+                const eff = document.getElementById("room-effects");
+                eff.innerHTML += `
+                    <div class="play-card" style="left:36%;bottom:55%;">🃏</div>
+                    <div class="play-card c2" style="left:43%;bottom:57%;">🎲</div>
+                    <div class="play-card c3" style="left:49%;bottom:54%;">🧩</div>
+                `;
+            }, 1800);
             setTimeout(() => addBubbleNear(c, "Leo", "Leo", "The robot always follows the rules I make. Real kids don't.", { align: "center" }), 2300);
             setTimeout(() => addBubbleNear(c, "Maria", "Maria", "Your teacher said you shoved someone at recess.", { align: "right", offsetX: -6 }), 4200);
             setTimeout(() => addBubbleNear(c, "Robot", "Robot", "Would you like to continue our game, Leo?", { align: "left", offsetX: 10 }), 5700);
@@ -552,9 +571,15 @@ const scenarios = [
         },
         narration: "What first looked like support now looks uncomfortably close to influence, because the robot knows when Sofia is most emotionally open.",
         animateIntro(c) {
+            setTimeout(() => {
+                moveEntity(c, ".scene-robot", { left: "40%" }, "walking");
+                const eff = document.getElementById("room-effects");
+                eff.innerHTML += `<div class="chat-glow" style="left:39%;bottom:39%;"></div>`;
+            }, 1800);
             setTimeout(() => addBubbleNear(c, "Sofia", "Sofia", "It understands me better than you do.", { align: "center" }), 2400);
             setTimeout(() => addBubbleNear(c, "Maria", "Maria", "Why is it offering mood-support content after every late-night conversation?", { align: "right", offsetX: -8 }), 4300);
             setTimeout(() => {
+                moveEntity(c, ".scene-robot", {}, "idle");
                 const eff = document.getElementById("room-effects");
                 eff.innerHTML += `
                     <div class="system-card warning" style="top:18%;left:8%;">
@@ -719,7 +744,15 @@ const scenarios = [
                     <div class="split-alert right">ROSA: kitchen fall detected</div>
                 `;
             }, 2200);
+            setTimeout(() => {
+                moveEntity(c, ".scene-robot", { left: "54%" }, "walking");
+                const eff = document.getElementById("room-effects");
+                eff.innerHTML += `<div class="response-path" style="left:46%;bottom:56%;width:110px;"></div>`;
+            }, 3200);
             setTimeout(() => addBubble(c, "left:40%;top:12%;", "System", "Priority assigned by emergency risk model."), 4200);
+            setTimeout(() => {
+                moveEntity(c, ".scene-robot", {}, "alarmed");
+            }, 5000);
             setTimeout(() => addBubbleNear(c, "Maria", "Maria", "Did this machine just do the math on my son and my mother?", { align: "left", offsetX: 4 }), 5900);
         },
         choices: [
