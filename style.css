@@ -260,8 +260,10 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,#f5f0e7 0%
 .event-overlay.visible{display:flex;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 
-.event-popup{background:var(--card-bg);border:1px solid rgba(47,127,116,0.18);border-radius:20px;padding:36px;max-width:560px;width:90%;box-shadow:var(--shadow);animation:popUp 0.5s cubic-bezier(0.34,1.56,0.64,1);}
+.event-popup{position:relative;background:var(--card-bg);border:1px solid rgba(47,127,116,0.18);border-radius:20px;padding:36px;max-width:560px;width:90%;box-shadow:var(--shadow);animation:popUp 0.5s cubic-bezier(0.34,1.56,0.64,1);}
 @keyframes popUp{from{transform:scale(0.8) translateY(40px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+.overlay-close{position:absolute;top:14px;right:14px;width:38px;height:38px;border:none;border-radius:50%;background:rgba(31,36,48,0.08);color:var(--text);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;}
+.overlay-close:hover{background:rgba(47,127,116,0.14);color:var(--accent);transform:scale(1.04);}
 
 .event-icon{font-size:40px;text-align:center;margin-bottom:8px;}
 .event-label{text-align:center;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--danger);font-weight:700;margin-bottom:12px;}
@@ -280,7 +282,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,#f5f0e7 0%
    ============================================= */
 .consequence-overlay{position:absolute;inset:0;background:rgba(41,36,28,0.36);z-index:60;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .consequence-overlay.visible{display:flex;animation:fadeIn 0.4s ease;}
-.consequence-popup{background:var(--card-bg);border:1px solid rgba(47,127,116,0.15);border-radius:20px;padding:32px;max-width:580px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow);animation:popUp 0.5s cubic-bezier(0.34,1.56,0.64,1);}
+.consequence-popup{position:relative;background:var(--card-bg);border:1px solid rgba(47,127,116,0.15);border-radius:20px;padding:32px;max-width:580px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow);animation:popUp 0.5s cubic-bezier(0.34,1.56,0.64,1);}
 .consequence-header{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:16px;}
 .consequence-body{font-size:15px;line-height:1.8;color:var(--text);margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(31,36,48,0.08);}
 .consequence-ethics{background:rgba(47,127,116,0.08);border-left:3px solid var(--accent);padding:14px 18px;border-radius:0 12px 12px 0;margin-bottom:20px;}

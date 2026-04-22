@@ -68,8 +68,9 @@
         </div>
     </div>
     <!-- EVENT POPUP -->
-    <div class="event-overlay" id="event-overlay">
-        <div class="event-popup" id="event-popup">
+    <div class="event-overlay" id="event-overlay" onclick="backToSceneFromEvent()">
+        <div class="event-popup" id="event-popup" onclick="event.stopPropagation()">
+            <button class="overlay-close" onclick="backToSceneFromEvent()" aria-label="Back to scene">✕</button>
             <div class="event-icon" id="event-icon"></div>
             <div class="event-label" id="event-label">ETHICAL DILEMMA</div>
             <h2 class="event-title" id="event-title"></h2>
@@ -81,8 +82,9 @@
         </div>
     </div>
     <!-- CONSEQUENCE -->
-    <div class="consequence-overlay" id="consequence-overlay">
-        <div class="consequence-popup">
+    <div class="consequence-overlay" id="consequence-overlay" onclick="backToSceneFromConsequence()">
+        <div class="consequence-popup" onclick="event.stopPropagation()">
+            <button class="overlay-close" onclick="backToSceneFromConsequence()" aria-label="Back to scene">✕</button>
             <div class="consequence-header" id="consequence-header"></div>
             <div class="consequence-body" id="consequence-body"></div>
             <div class="consequence-ethics" id="consequence-ethics"></div>

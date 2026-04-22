@@ -827,6 +827,21 @@ function backToSceneFromConsequence() {
     document.getElementById("narration-bar").classList.add("visible");
 }
 
+function handleOverlayEscape(e) {
+    if (e.key !== "Escape") return;
+    if (document.getElementById("alt-overlay").classList.contains("visible")) {
+        hideAlternatives();
+        return;
+    }
+    if (document.getElementById("consequence-overlay").classList.contains("visible")) {
+        backToSceneFromConsequence();
+        return;
+    }
+    if (document.getElementById("event-overlay").classList.contains("visible")) {
+        backToSceneFromEvent();
+    }
+}
+
 function showStoryIntro() {
     const s = scenarios[current];
     if (!s) {
@@ -1113,4 +1128,5 @@ function hide(id) {
 document.addEventListener("DOMContentLoaded", () => {
     const bg = document.getElementById("room-bg");
     if (bg) bg.style.transition = "opacity 0.5s ease";
+    document.addEventListener("keydown", handleOverlayEscape);
 });
