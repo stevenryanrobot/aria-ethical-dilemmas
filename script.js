@@ -778,6 +778,45 @@ function startGame() {
     showStoryIntro();
 }
 
+function updateStoryNav() {
+    const prevBtn = document.getElementById("story-prev-btn");
+    if (prevBtn) prevBtn.disabled = current === 0;
+}
+
+function goPrevFromStoryIntro() {
+    if (current === 0) return;
+    current--;
+    choices = choices.filter((entry) => entry.scenario <= current + 1);
+    document.getElementById("game-screen").classList.remove("active");
+    hide("event-overlay");
+    hide("consequence-overlay");
+    hide("alt-overlay");
+    showStoryIntro();
+}
+
+function goNextFromStoryIntro() {
+    const storyScreen = document.getElementById("story-intro");
+    storyScreen.classList.remove("active");
+    storyScreen.style.cursor = "";
+    document.getElementById("game-screen").classList.add("active");
+    loadScenario();
+}
+
+function goBackToStoryIntro() {
+    document.getElementById("game-screen").classList.remove("active");
+    hide("event-overlay");
+    hide("consequence-overlay");
+    hide("alt-overlay");
+    showStoryIntro();
+}
+
+function goForwardToEvent() {
+    const s = scenarios[current];
+    const narBar = document.getElementById("narration-bar");
+    narBar.classList.remove("visible");
+    triggerEvent(s);
+}
+
 function showStoryIntro() {
     const s = scenarios[current];
     if (!s) {
@@ -797,6 +836,7 @@ function showStoryIntro() {
     document.getElementById("story-title").textContent = s.storyIntro.title;
     document.getElementById("story-text").textContent = s.storyIntro.text;
     document.getElementById("story-time").textContent = s.storyIntro.time;
+    updateStoryNav();
 
     ["story-chapter", "story-title", "story-text", "story-time"].forEach((id) => {
         const el = document.getElementById(id);
@@ -804,33 +844,6 @@ function showStoryIntro() {
         el.offsetHeight;
         el.style.animation = "";
     });
-
-    const oldPrompt = document.getElementById("story-click-prompt");
-    if (oldPrompt) oldPrompt.remove();
-
-    const promptTimer = setTimeout(() => {
-        if (!storyScreen.classList.contains("active")) return;
-        if (document.getElementById("story-click-prompt")) return;
-        const prompt = document.createElement("div");
-        prompt.id = "story-click-prompt";
-        prompt.textContent = "▶ Click anywhere to continue";
-        prompt.style.cssText = "position:absolute;bottom:40px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.88);font-size:14px;letter-spacing:3px;font-weight:600;padding:12px 28px;border:1px solid rgba(255,255,255,0.35);border-radius:30px;background:rgba(0,0,0,0.32);backdrop-filter:blur(4px);animation:promptPulse 2s ease-in-out infinite;z-index:20;pointer-events:none;";
-        storyScreen.appendChild(prompt);
-    }, 1400);
-
-    function onStoryClick() {
-        storyScreen.removeEventListener("click", onStoryClick);
-        clearTimeout(promptTimer);
-        const p = document.getElementById("story-click-prompt");
-        if (p) p.remove();
-        storyScreen.classList.remove("active");
-        storyScreen.style.cursor = "";
-        document.getElementById("game-screen").classList.add("active");
-        loadScenario();
-    }
-
-    storyScreen.style.cursor = "pointer";
-    storyScreen.addEventListener("click", onStoryClick);
 }
 
 function loadScenario() {
@@ -876,24 +889,8 @@ function loadScenario() {
 
     s.animateIntro(chars);
 
-    setTimeout(() => {
-        const prompt = document.createElement("div");
-        prompt.id = "click-prompt";
-        prompt.innerHTML = "▶ Click anywhere to continue";
-        document.getElementById("room-effects").appendChild(prompt);
-
-        function onClickContinue() {
-            vp.removeEventListener("click", onClickContinue);
-            const p = document.getElementById("click-prompt");
-            if (p) p.remove();
-            narBar.classList.remove("visible");
-            triggerEvent(s);
-        }
-
-        vp.style.pointerEvents = "auto";
-        vp.style.cursor = "pointer";
-        vp.addEventListener("click", onClickContinue);
-    }, 7600);
+    vp.style.pointerEvents = "auto";
+    vp.style.cursor = "default";
 }
 
 function triggerEvent(s) {
@@ -929,6 +926,7 @@ function makeChoice(idx) {
     const s = scenarios[current];
     const ch = s.choices[idx];
 
+    choices = choices.filter((entry) => entry.scenario !== current + 1);
     choices.push({
         scenario: current + 1,
         title: s.eventTitle,
@@ -952,6 +950,12 @@ function makeChoice(idx) {
     btn.textContent = current === scenarios.length - 1 ? "See Final Reflection →" : "Continue →";
 
     show("consequence-overlay");
+}
+
+function changeChoice() {
+    choices = choices.filter((entry) => entry.scenario !== current + 1);
+    hide("consequence-overlay");
+    triggerEvent(scenarios[current]);
 }
 
 function showAlternatives() {

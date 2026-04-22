@@ -34,6 +34,10 @@
             <h2 class="story-title" id="story-title"></h2>
             <p class="story-text" id="story-text"></p>
             <div class="story-time" id="story-time"></div>
+            <div class="nav-controls">
+                <button class="nav-btn" id="story-prev-btn" onclick="goPrevFromStoryIntro()">← Previous</button>
+                <button class="nav-btn nav-btn-primary" id="story-next-btn" onclick="goNextFromStoryIntro()">Enter Scene →</button>
+            </div>
         </div>
     </div>
 </div>
@@ -58,6 +62,10 @@
         <div class="narration-bar" id="narration-bar">
             <div class="narration-text" id="narration-text"></div>
         </div>
+        <div class="phase-nav" id="phase-nav">
+            <button class="nav-btn" onclick="goBackToStoryIntro()">← Story</button>
+            <button class="nav-btn nav-btn-primary" onclick="goForwardToEvent()">Dilemma →</button>
+        </div>
     </div>
     <!-- EVENT POPUP -->
     <div class="event-overlay" id="event-overlay">
@@ -76,6 +84,7 @@
             <div class="consequence-body" id="consequence-body"></div>
             <div class="consequence-ethics" id="consequence-ethics"></div>
             <div class="consequence-buttons">
+                <button class="btn-alt" onclick="changeChoice()">← Change Choice</button>
                 <button class="btn-alt" onclick="showAlternatives()">Other Choices</button>
                 <button class="btn-continue" id="btn-continue" onclick="nextScenario()">Continue →</button>
             </div>
